@@ -1,6 +1,8 @@
 %{
 #include <string.h>
 #include <stdio.h>
+#include <map>
+#include <vector>
 
 int numLines = 1;
 void printToken(const char* tokenType, const char* lexeme);
@@ -9,6 +11,32 @@ void printRule(const char*, const char*);
 bool validateIntConst(const char* intconst);
 int yyerror(const char *s);
 const char* maxint = "2147483647";
+
+enum TOKEN_TYPE { ARRAY, INTEGER, CHAR, BOOLEAN };
+
+struct TYPE_INFO {
+    TOKEN_TYPE type;
+};
+
+typedef std::map<const char*, TYPE_INFO> SymbolTable;
+
+class ProgramScope {
+private:
+    std::vector<SymbolTable> table;
+
+public:
+    ProgramScope(): table(0) {}
+
+    void pushScope() { table.push_back(SymbolTable()); }
+
+    //return success/failure of insertion
+    bool insertSymbol(const char* ident, TYPE_INFO info) {
+        SymbolTable& current = table.back();
+        return current.insert(std::pair<const char*, TYPE_INFO>(ident, info)).second;
+    }
+};
+
+ProgramScope programScope;
 
 extern "C" {
     int yyparse(void);
