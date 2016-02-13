@@ -9,6 +9,7 @@ void printToken(const char* tokenType, const char* lexeme);
 void printError(const char* error, const char* lexeme);
 void printRule(const char*, const char*);
 bool validateIntConst(const char* intconst);
+void fillSymbolTable(TOKEN_TYPE type);
 int yyerror(const char *s);
 const char* maxint = "2147483647";
 
@@ -526,6 +527,35 @@ bool validateIntConst(const char* intconst) {
     }
 
     return true;
+}
+
+void fillSymbolTable(TOKEN_TYPE type) {
+    char* name;
+    switch(type){
+        case ARRAY:
+            name = "ARRAY";
+            break;
+        case PROGRAM:
+            name = "PROGRAM";
+            break;
+        case CHAR:
+            name = "CHAR";
+            break;
+        case BOOLEAN:
+            name = "BOOLEAN";
+            break;
+    }
+
+    for (std::vector<char*>::iterator i = ident_buffer.begin(); i != ident_buffer.end(); ++i)
+    {
+        char* ident = *i;
+        TYPE_INFO info;
+        info.type = type;
+        programScope.insertSymbol(ident, info);
+        printf("___Adding %s to symbol table with type %s\n", ident, name);
+    }
+
+    ident_buffer = std::vector<char*>();
 }
 
 void printRule(const char* lhs, const char* rhs) {
