@@ -12,10 +12,14 @@ bool validateIntConst(const char* intconst);
 int yyerror(const char *s);
 const char* maxint = "2147483647";
 
-enum TOKEN_TYPE { ARRAY, INTEGER, CHAR, BOOLEAN };
+enum TOKEN_TYPE { ARRAY, INTEGER, CHAR, BOOLEAN, UNDECLARED };
 
 struct TYPE_INFO {
     TOKEN_TYPE type;
+
+    TYPE_INFO(){
+        type = UNDECLARED;
+    }
 };
 
 typedef std::map<const char*, TYPE_INFO> SymbolTable;
@@ -33,6 +37,17 @@ public:
     bool insertSymbol(const char* ident, TYPE_INFO info) {
         SymbolTable& current = table.back();
         return current.insert(std::pair<const char*, TYPE_INFO>(ident, info)).second;
+    }
+
+    TYPE_INFO findSymbol(const char* ident) {
+        SymbolTable& current = table.back();
+        std::map<const char*, TYPE_INFO>::iterator it;
+        it = current.find(ident);
+        if(it != current.end()) {
+            return it->second;
+        } else {
+            return TYPE_INFO();
+        }
     }
 };
 
