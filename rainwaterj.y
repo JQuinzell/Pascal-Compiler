@@ -53,6 +53,8 @@ public:
 
 ProgramScope programScope;
 
+std::vector<char*> ident_buffer(0);
+
 extern "C" {
     int yyparse(void);
     int yylex(void);
@@ -122,8 +124,8 @@ N_VARDEC : N_IDENT N_IDENTLST T_COLON N_TYPE
     printRule("N_VARDEC", "N_IDENT N_IDENTLST T_COLON N_TYPE");
 }
 
-N_IDENT : T_IDENT
 {
+N_IDENT : T_IDENT
     $$ = $1;  //Might need anther element in stuct
     printRule("N_IDENT", "T_IDENT");
 }
