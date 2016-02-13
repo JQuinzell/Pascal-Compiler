@@ -17,13 +17,10 @@ enum TOKEN_TYPE { PROGRAM, ARRAY, INTEGER, CHAR, BOOLEAN, UNDECLARED };
 
 struct TYPE_INFO {
     TOKEN_TYPE type;
-    TOKEN_TYPE startIndex;
-    TOKEN_TYPE endIndex; 
+    char* startIndex;
+    char* endIndex; 
+    char* name;
     TOKEN_TYPE baseType; 
-
-    TYPE_INFO(){
-        type = UNDECLARED;
-    }
 };
 
 typedef std::map<const char*, TYPE_INFO> SymbolTable;
@@ -76,8 +73,8 @@ char* text;
 %token T_WSPACE T_ASSIGN T_MULT T_PLUS T_MINUS T_DIV T_AND T_OR T_NOT T_LT T_GT T_LE T_GE T_EQ T_NE T_VAR T_OF T_BOOL T_CHAR 
 %token T_INT T_PROG T_PROC T_BEGIN T_END T_WHILE T_DO T_IF T_READ T_WRITE T_TRUE T_FALSE T_LBRACK T_RBRACK T_NEWLINE
 %token T_SCOLON T_COLON T_LPAREN T_RPAREN T_COMMA T_DOT T_DOTDOT T_ARRAY T_CHARCONST T_IDENT T_INTCONST T_UNKNOWN
-%type <text> T_IDENT T_INTCONST
-%type <typeInfo> N_ARRAY N_IDENT N_TYPE N_IDX N_INTCONST N_SIMPLE N_IDXRANGE 
+%type <text> T_IDENT T_INTCONST 
+%type <typeInfo> N_ARRAY N_IDENT N_TYPE N_IDX N_INTCONST N_IDXRANGE N_SIMPLE 
 %nonassoc T_THEN
 %nonassoc T_ELSE
 
@@ -127,13 +124,12 @@ N_VARDECLST : N_VARDEC T_SCOLON N_VARDECLST
 
 N_VARDEC : N_IDENT N_IDENTLST T_COLON N_TYPE
 {
-    insertSymbol($1, $4);// assuming N_IDENTLST -> Epsilon 
+    //insertSymbol($1, $4);// assuming N_IDENTLST -> Epsilon 
     printRule("N_VARDEC", "N_IDENT N_IDENTLST T_COLON N_TYPE");
 }
 
 {
-N_IDENT : T_IDENT
-    $$ = $1;  //Might need anther element in stuct
+    $$.name = $1;  //Might need anther element in stuct
     printRule("N_IDENT", "T_IDENT");
 }
 
@@ -163,20 +159,20 @@ N_ARRAY : T_ARRAY T_LBRACK N_IDXRANGE T_RBRACK T_OF N_SIMPLE
 {
     $$.startIndex =$3.startIndex;
     $$.endIndex = $3.endIndex;
-    $$.baseType = $6; 
+    $$.baseType = $6.type; 
     printRule("N_ARRAY", "T_ARRAY T_LBRACK N_IDXRANGE T_RBRACK T_OF N_SIMPLE");
 }
 
 N_IDX : N_INTCONST
 {
-    $$ = $1; //Assuming this statement is valid
+    $$.name = $1.name; //Assuming this statement is valid
     printRule("N_IDX", "N_INTCONST");
 }
 
 N_IDXRANGE : N_IDX T_DOTDOT N_IDX
 {
-    $$.startIndex = $1;
-    $$.endIndex = $3;
+    $$.startIndex = $1.name; ////////////////////////////////////////
+    $$.endIndex = $3.name;
     printRule("N_IDXRANGE", "N_IDX T_DOTDOT N_IDX");
 }
 
@@ -492,7 +488,7 @@ N_CONST : N_INTCONST
 
 N_INTCONST : N_SIGN T_INTCONST //we Need a Conversion!!!!!
 {
-    $$ = $2;
+    $$.name = $2;
     printRule("N_INTCONST", "N_SIGN T_INTCONST");
 }
 
