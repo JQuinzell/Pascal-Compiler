@@ -121,7 +121,8 @@ N_VARDECLST : N_VARDEC T_SCOLON N_VARDECLST
 
 N_VARDEC : N_IDENT N_IDENTLST T_COLON N_TYPE
 {
-    //insertSymbol($1, $4);// assuming N_IDENTLST -> Epsilon 
+    
+    programScope.insertSymbol($1.name, $4);// assuming N_IDENTLST -> Epsilon 
     printRule("N_VARDEC", "N_IDENT N_IDENTLST T_COLON N_TYPE");
 }
 
@@ -169,7 +170,7 @@ N_IDX : N_INTCONST
 
 N_IDXRANGE : N_IDX T_DOTDOT N_IDX
 {
-    $$.startIndex = $1.name; ////////////////////////////////////////
+    $$.startIndex = $1.name; 
     $$.endIndex = $3.name;
     printRule("N_IDXRANGE", "N_IDX T_DOTDOT N_IDX");
 }
