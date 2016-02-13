@@ -283,6 +283,7 @@ UNKNOWN     .
                 }
 
 {IDENT}         {
+		    yylval.text = strdup(yytext);
                     printToken("T_IDENT", yytext);
                     return T_IDENT;                    
                 }
