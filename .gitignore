@@ -1,0 +1,5 @@
+*.out
+*.yy.c
+*.tab.c
+test.cpp
+test.txt
