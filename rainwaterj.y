@@ -12,7 +12,7 @@ bool validateIntConst(const char* intconst);
 int yyerror(const char *s);
 const char* maxint = "2147483647";
 
-enum TOKEN_TYPE { ARRAY, INTEGER, CHAR, BOOLEAN, UNDECLARED };
+enum TOKEN_TYPE { PROGRAM, ARRAY, INTEGER, CHAR, BOOLEAN, UNDECLARED };
 
 struct TYPE_INFO {
     TOKEN_TYPE type;
