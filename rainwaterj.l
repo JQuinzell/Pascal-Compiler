@@ -296,8 +296,10 @@ UNKNOWN     .
                 }
 
 {INTCONST}      {
+                    
                     if(yyleng == 1) {
                         printToken("T_INTCONST", yytext);
+                        yylval.text = strdup(yytext);
                         return T_INTCONST;                        
                     }
 
@@ -309,9 +311,11 @@ UNKNOWN     .
                         return T_UNKNOWN;
                     } else if(size < 10) {                    
                         printToken("T_INTCONST", yytext);
+                        yylval.text = strdup(yytext);
                         return T_INTCONST;
                     } else if(validateIntConst(yytext+idx)) {
                         printToken("T_INTCONST", yytext);
+                        yylval.text = strdup(yytext);
                         return T_INTCONST;
                     } else {
                         printError("Invalid integer constant", yytext);
