@@ -15,8 +15,6 @@ const char* maxint = "2147483647";
 
 enum TOKEN_TYPE { PROGRAM, ARRAY, INTEGER, CHAR, BOOLEAN, UNDECLARED };
 
-void fillSymbolTable(TOKEN_TYPE type);
-
 struct TYPE_INFO {
     TOKEN_TYPE type;
     int startIndex;
@@ -24,6 +22,8 @@ struct TYPE_INFO {
     char* name;
     TOKEN_TYPE baseType; 
 };
+
+void fillSymbolTable(TYPE_INFO);
 
 typedef std::map<const char*, TYPE_INFO> SymbolTable;
 
@@ -100,7 +100,9 @@ N_PROG : N_PROGLBL T_IDENT T_SCOLON
 {
     programScope.pushScope();
     ident_buffer.push_back($2);
-    fillSymbolTable(PROGRAM);
+    TYPE_INFO t;
+    t.type = PROGRAM;
+    fillSymbolTable(t);
     printRule("N_PROG", "N_PROGLBL T_IDENT T_SCOLON N_BLOCK T_DOT");
 }
 N_BLOCK T_DOT
@@ -132,7 +134,7 @@ N_VARDEC : N_IDENT N_IDENTLST T_COLON N_TYPE
 {
     // insertSymbol($1, $4);// assuming N_IDENTLST -> Epsilon 
     printRule("N_VARDEC", "N_IDENT N_IDENTLST T_COLON N_TYPE");
-    fillSymbolTable($4.type);
+    fillSymbolTable($4);
 }
 
 N_IDENT : T_IDENT
@@ -545,9 +547,9 @@ bool validateIntConst(const char* intconst) {
     return true;
 }
 
-void fillSymbolTable(TOKEN_TYPE type) {
+void fillSymbolTable(TYPE_INFO info) {
     const char* name;
-    switch(type){
+    switch(info.type){
         case ARRAY:
             name = "ARRAY";
             break;
@@ -568,8 +570,6 @@ void fillSymbolTable(TOKEN_TYPE type) {
     for (std::list<char*>::iterator i = ident_buffer.begin(); i != ident_buffer.end(); ++i)
     {
         char* ident = *i;
-        TYPE_INFO info;
-        info.type = type;
         programScope.insertSymbol(ident, info);
         printf("___Adding %s to symbol table with type %s\n", ident, name);
     }
