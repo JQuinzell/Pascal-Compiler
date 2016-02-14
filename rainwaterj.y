@@ -14,7 +14,7 @@ bool validateIntConst(const char* intconst);
 int yyerror(const char *s);
 const char* maxint = "2147483647";
 
-enum TOKEN_TYPE { PROGRAM, ARRAY, INTEGER, CHAR, BOOLEAN, UNDECLARED };
+enum TOKEN_TYPE { PROGRAM, ARRAY, INTEGER, CHAR, BOOLEAN, PROCEDURE, UNDECLARED };
 
 struct TYPE_INFO {
     TOKEN_TYPE type;
@@ -36,7 +36,7 @@ private:
 public:
     ProgramScope(): table(0) {}
 
-    void pushScope() { table.push_back(SymbolTable()); }
+    void pushScope() { table.push_back(SymbolTable()); printf("___Entering new scope...\n"); }
 
     //return success/failure of insertion
     bool insertSymbol(const char* ident, TYPE_INFO info) {
@@ -218,11 +218,17 @@ N_PROCDECPART : N_PROCDEC T_SCOLON N_PROCDECPART
 N_PROCDEC : N_PROCHDR N_BLOCK
 {
     printRule("N_PROCDEC", "N_PROCHDR N_BLOCK");
+    printf("___Exiting scope...\n");
 }
 
 N_PROCHDR : T_PROC T_IDENT T_SCOLON
 {
     printRule("N_PROCHDR", "T_PROC T_IDENT T_SCOLON");
+    TYPE_INFO t;
+    t.type = PROCEDURE;
+    ident_buffer.push_back($2);
+    fillSymbolTable(t);
+    programScope.pushScope();
 }
 
 N_STMTPART : N_COMPOUND
@@ -582,6 +588,8 @@ std::string getTypeName(TOKEN_TYPE type) {
             return "BOOLEAN";
         case INTEGER:
             return "INTEGER";
+        case PROCEDURE:
+            return "PROCEDURE";
     }
 
     return "UNDECLARED";
