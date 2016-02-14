@@ -571,7 +571,8 @@ void fillSymbolTable(TYPE_INFO info) {
     {
         char* ident = *i;
         programScope.insertSymbol(ident, info);
-        printf("___Adding %s to symbol table with type %s\n", ident, name);
+        if(info.type != ARRAY) printf("___Adding %s to symbol table with type %s\n", ident, name);
+        else printf("___Adding %s to symbol table with type ARRAY %d .. %d OF %d\n", ident, info.startIndex, info.endIndex, info.baseType);
     }
 
     ident_buffer = std::list<char*>();
