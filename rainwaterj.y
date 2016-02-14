@@ -1,5 +1,6 @@
 %{
 #include <string.h>
+#include <string>
 #include <stdio.h>
 #include <map>
 #include <vector>
@@ -23,6 +24,7 @@ struct TYPE_INFO {
     TOKEN_TYPE baseType; 
 };
 
+std::string getTypeName(TOKEN_TYPE type);
 void fillSymbolTable(TYPE_INFO);
 
 typedef std::map<const char*, TYPE_INFO> SymbolTable;
@@ -548,35 +550,41 @@ bool validateIntConst(const char* intconst) {
 }
 
 void fillSymbolTable(TYPE_INFO info) {
-    const char* name;
-    switch(info.type){
-        case ARRAY:
-            name = "ARRAY";
-            break;
-        case PROGRAM:
-            name = "PROGRAM";
-            break;
-        case CHAR:
-            name = "CHAR";
-            break;
-        case BOOLEAN:
-            name = "BOOLEAN";
-            break;
-        case INTEGER:
-            name = "INTEGER";
-            break;
-    }
+    const char* name = getTypeName(info.type).c_str();
 
     for (std::list<char*>::iterator i = ident_buffer.begin(); i != ident_buffer.end(); ++i)
     {
         char* ident = *i;
         programScope.insertSymbol(ident, info);
-        if(info.type != ARRAY) printf("___Adding %s to symbol table with type %s\n", ident, name);
-        else printf("___Adding %s to symbol table with type ARRAY %d .. %d OF %d\n", ident, info.startIndex, info.endIndex, info.baseType);
+        if(info.type != ARRAY) 
+            printf("___Adding %s to symbol table with type %s\n", ident, name);
+        else 
+            printf("___Adding %s to symbol table with type ARRAY %d .. %d OF %s\n",
+                ident, 
+                info.startIndex, 
+                info.endIndex, 
+                getTypeName(info.baseType).c_str());
     }
 
     ident_buffer = std::list<char*>();
 
+}
+
+std::string getTypeName(TOKEN_TYPE type) {
+    switch(type){
+        case ARRAY:
+            return "ARRAY";
+        case PROGRAM:
+            return "PROGRAM";
+        case CHAR:
+            return "CHAR";
+        case BOOLEAN:
+            return "BOOLEAN";
+        case INTEGER:
+            return "INTEGER";
+    }
+
+    return "UNDECLARED";
 }
 
 void printRule(const char* lhs, const char* rhs) {
