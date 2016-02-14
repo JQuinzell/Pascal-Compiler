@@ -9,11 +9,12 @@ void printToken(const char* tokenType, const char* lexeme);
 void printError(const char* error, const char* lexeme);
 void printRule(const char*, const char*);
 bool validateIntConst(const char* intconst);
-void fillSymbolTable(TOKEN_TYPE type);
 int yyerror(const char *s);
 const char* maxint = "2147483647";
 
 enum TOKEN_TYPE { PROGRAM, ARRAY, INTEGER, CHAR, BOOLEAN, UNDECLARED };
+
+void fillSymbolTable(TOKEN_TYPE type);
 
 struct TYPE_INFO {
     TOKEN_TYPE type;
@@ -96,6 +97,7 @@ N_PROGLBL : T_PROG
 
 N_PROG : N_PROGLBL T_IDENT T_SCOLON N_BLOCK T_DOT
 {
+    // printf("%s!!!\n", $2);
     printRule("N_PROG", "N_PROGLBL T_IDENT T_SCOLON N_BLOCK T_DOT");
 }
 
@@ -129,6 +131,7 @@ N_VARDEC : N_IDENT N_IDENTLST T_COLON N_TYPE
     printRule("N_VARDEC", "N_IDENT N_IDENTLST T_COLON N_TYPE");
 }
 
+N_IDENT : T_IDENT
 {
     $$.name = $1;  //Might need anther element in stuct
     printRule("N_IDENT", "T_IDENT");
@@ -534,7 +537,7 @@ bool validateIntConst(const char* intconst) {
 }
 
 void fillSymbolTable(TOKEN_TYPE type) {
-    char* name;
+    const char* name;
     switch(type){
         case ARRAY:
             name = "ARRAY";
