@@ -97,7 +97,9 @@ N_PROGLBL : T_PROG
 
 N_PROG : N_PROGLBL T_IDENT T_SCOLON N_BLOCK T_DOT
 {
-    // printf("%s!!!\n", $2);
+    programScope.pushScope();
+    ident_buffer.push_back($2);
+    fillSymbolTable(PROGRAM);
     printRule("N_PROG", "N_PROGLBL T_IDENT T_SCOLON N_BLOCK T_DOT");
 }
 
