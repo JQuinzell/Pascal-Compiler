@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <map>
 #include <vector>
+#include <list>
 
 int numLines = 1;
 void printToken(const char* tokenType, const char* lexeme);
@@ -55,7 +56,7 @@ public:
 
 ProgramScope programScope;
 
-std::vector<char*> ident_buffer(0);
+std::list<char*> ident_buffer(0);
 
 extern "C" {
     int yyparse(void);
@@ -95,13 +96,14 @@ N_PROGLBL : T_PROG
     printRule("N_PROGLBL", "T_PROG");
 }
 
-N_PROG : N_PROGLBL T_IDENT T_SCOLON N_BLOCK T_DOT
+N_PROG : N_PROGLBL T_IDENT T_SCOLON
 {
     programScope.pushScope();
     ident_buffer.push_back($2);
     fillSymbolTable(PROGRAM);
     printRule("N_PROG", "N_PROGLBL T_IDENT T_SCOLON N_BLOCK T_DOT");
 }
+N_BLOCK T_DOT
 
 N_BLOCK : N_VARDECPART N_PROCDECPART N_STMTPART
 {
@@ -128,8 +130,10 @@ N_VARDECLST : N_VARDEC T_SCOLON N_VARDECLST
 
 N_VARDEC : N_IDENT N_IDENTLST T_COLON N_TYPE
 {
-    //insertSymbol($1, $4);// assuming N_IDENTLST -> Epsilon 
+    ident_buffer.push_front($1.name);
+    // insertSymbol($1, $4);// assuming N_IDENTLST -> Epsilon 
     printRule("N_VARDEC", "N_IDENT N_IDENTLST T_COLON N_TYPE");
+    fillSymbolTable($4.type);
 }
 
 N_IDENT : T_IDENT
@@ -140,6 +144,7 @@ N_IDENT : T_IDENT
 
 N_IDENTLST : T_COMMA N_IDENT N_IDENTLST
 {
+    ident_buffer.push_back($2.name);
     printRule("N_IDENTLST", "T_COMMA N_IDENT N_IDENTLST");
 }
 | /* epsilon */
@@ -554,7 +559,7 @@ void fillSymbolTable(TOKEN_TYPE type) {
             break;
     }
 
-    for (std::vector<char*>::iterator i = ident_buffer.begin(); i != ident_buffer.end(); ++i)
+    for (std::list<char*>::iterator i = ident_buffer.begin(); i != ident_buffer.end(); ++i)
     {
         char* ident = *i;
         TYPE_INFO info;
@@ -563,7 +568,7 @@ void fillSymbolTable(TOKEN_TYPE type) {
         printf("___Adding %s to symbol table with type %s\n", ident, name);
     }
 
-    ident_buffer = std::vector<char*>();
+    ident_buffer = std::list<char*>();
 }
 
 void printRule(const char* lhs, const char* rhs) {
