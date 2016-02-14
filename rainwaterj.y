@@ -130,7 +130,6 @@ N_VARDECLST : N_VARDEC T_SCOLON N_VARDECLST
 
 N_VARDEC : N_IDENT N_IDENTLST T_COLON N_TYPE
 {
-    ident_buffer.push_front($1.name);
     // insertSymbol($1, $4);// assuming N_IDENTLST -> Epsilon 
     printRule("N_VARDEC", "N_IDENT N_IDENTLST T_COLON N_TYPE");
     fillSymbolTable($4.type);
@@ -138,13 +137,13 @@ N_VARDEC : N_IDENT N_IDENTLST T_COLON N_TYPE
 
 N_IDENT : T_IDENT
 {
+    ident_buffer.push_front($1);
     $$.name = $1;  //Might need anther element in stuct
     printRule("N_IDENT", "T_IDENT");
 }
 
 N_IDENTLST : T_COMMA N_IDENT N_IDENTLST
 {
-    ident_buffer.push_back($2.name);
     printRule("N_IDENTLST", "T_COMMA N_IDENT N_IDENTLST");
 }
 | /* epsilon */
@@ -561,6 +560,9 @@ void fillSymbolTable(TOKEN_TYPE type) {
         case BOOLEAN:
             name = "BOOLEAN";
             break;
+        case INTEGER:
+            name = "INTEGER";
+            break;
     }
 
     for (std::list<char*>::iterator i = ident_buffer.begin(); i != ident_buffer.end(); ++i)
@@ -573,6 +575,7 @@ void fillSymbolTable(TOKEN_TYPE type) {
     }
 
     ident_buffer = std::list<char*>();
+
 }
 
 void printRule(const char* lhs, const char* rhs) {
