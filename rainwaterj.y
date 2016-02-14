@@ -54,6 +54,13 @@ public:
             return TYPE_INFO();
         }
     }
+
+    bool symbolDeclared(const char* ident) {
+        for (std::vector<SymbolTable>::reverse_iterator scope = table.rbegin(); scope != table.rend(); ++scope)
+            if(scope->count(ident) > 0) return true;   
+
+        return false;
+    }
 };
 
 ProgramScope programScope;
