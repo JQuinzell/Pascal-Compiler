@@ -19,8 +19,8 @@ void fillSymbolTable(TOKEN_TYPE type);
 
 struct TYPE_INFO {
     TOKEN_TYPE type;
-    char* startIndex;
-    char* endIndex; 
+    int startIndex;
+    int endIndex; 
     char* name;
     TOKEN_TYPE baseType; 
 };
@@ -76,7 +76,7 @@ char* text;
 %token T_INT T_PROG T_PROC T_BEGIN T_END T_WHILE T_DO T_IF T_READ T_WRITE T_TRUE T_FALSE T_LBRACK T_RBRACK T_NEWLINE
 %token T_SCOLON T_COLON T_LPAREN T_RPAREN T_COMMA T_DOT T_DOTDOT T_ARRAY T_CHARCONST T_IDENT T_INTCONST T_UNKNOWN
 %type <text> T_IDENT T_INTCONST 
-%type <typeInfo> N_ARRAY N_IDENT N_TYPE N_IDX N_INTCONST N_IDXRANGE N_SIMPLE 
+%type <typeInfo> N_ARRAY N_IDENT N_TYPE N_IDX N_INTCONST N_IDXRANGE N_SIMPLE N_SIGN
 %nonassoc T_THEN
 %nonassoc T_ELSE
 
@@ -154,6 +154,7 @@ N_IDENTLST : T_COMMA N_IDENT N_IDENTLST
 
 N_TYPE : N_SIMPLE
 {
+    $$.type = $1.type; 
     printRule("N_TYPE", "N_SIMPLE");
 }
 | N_ARRAY
@@ -175,14 +176,14 @@ N_ARRAY : T_ARRAY T_LBRACK N_IDXRANGE T_RBRACK T_OF N_SIMPLE
 
 N_IDX : N_INTCONST
 {
-    $$.name = $1.name; //Assuming this statement is valid
+    $$.startIndex = $1.startIndex; //startIndex is being used as a storage container for the intvalue
     printRule("N_IDX", "N_INTCONST");
 }
 
 N_IDXRANGE : N_IDX T_DOTDOT N_IDX
 {
-    $$.startIndex = $1.name; ////////////////////////////////////////
-    $$.endIndex = $3.name;
+    $$.startIndex = $1.startIndex; ////////////////////////////////////////
+    $$.endIndex = $3.startIndex;
     printRule("N_IDXRANGE", "N_IDX T_DOTDOT N_IDX");
 }
 
@@ -392,14 +393,17 @@ N_FACTOR : N_SIGN N_VARIABLE
 
 N_SIGN : T_PLUS
 {
+    $$.startIndex = 1;
     printRule("N_SIGN", "T_PLUS");
 }
 | T_MINUS
 {
+    $$.startIndex = -1;
     printRule("N_SIGN", "T_MINUS");
 }
 | /* epsilon */
 {
+    $$.startIndex = 1;
     printRule("N_SIGN", "epsilon");
 }
 
@@ -498,7 +502,7 @@ N_CONST : N_INTCONST
 
 N_INTCONST : N_SIGN T_INTCONST //we Need a Conversion!!!!!
 {
-    $$.name = $2;
+    $$.startIndex = $1.startIndex * atoi($2);
     printRule("N_INTCONST", "N_SIGN T_INTCONST");
 }
 
