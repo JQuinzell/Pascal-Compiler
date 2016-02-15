@@ -47,10 +47,8 @@ public:
     }
 
     bool symbolDeclared(const char* ident) {
-        for (std::vector<SymbolTable>::reverse_iterator scope = table.rbegin(); scope != table.rend(); ++scope)
-            if(scope->count(ident) > 0) return true;   
-
-        return false;
+        SymbolTable& scope = table.back();
+        return scope.count(ident) > 0;
     }
 };
 
