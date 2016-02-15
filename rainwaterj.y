@@ -36,7 +36,7 @@ private:
 public:
     ProgramScope(): table(0) {}
 
-    void pushScope() { table.push_back(SymbolTable()); printf("___Entering new scope...\n"); }
+    void pushScope() { table.push_back(SymbolTable()); printf("\n___Entering new scope...\n\n"); }
 
     void popScope() { table.pop_back(); printf("___Exiting scope...\n");}
 
