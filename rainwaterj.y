@@ -554,7 +554,7 @@ bool validateIntConst(const char* intconst) {
 }
 
 void fillSymbolTable(TYPE_INFO info) {
-    const char* name = getTypeName(info.type).c_str();
+    std::string name = getTypeName(info.type);
 
     for (std::list<char*>::iterator i = ident_buffer.begin(); i != ident_buffer.end(); ++i)
     {
@@ -563,7 +563,7 @@ void fillSymbolTable(TYPE_INFO info) {
 
         programScope.insertSymbol(ident, info);
         if(info.type != ARRAY) 
-            printf("___Adding %s to symbol table with type %s\n", ident, name);
+            printf("___Adding %s to symbol table with type %s\n", ident, name.c_str());
         else 
             printf("___Adding %s to symbol table with type ARRAY %d .. %d OF %s\n",
                 ident, 
