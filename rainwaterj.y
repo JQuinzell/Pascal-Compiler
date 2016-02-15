@@ -27,7 +27,7 @@ struct TYPE_INFO {
 std::string getTypeName(TOKEN_TYPE type);
 void fillSymbolTable(TYPE_INFO);
 
-typedef std::map<const char*, TYPE_INFO> SymbolTable;
+typedef std::map<std::string, TYPE_INFO> SymbolTable;
 
 class ProgramScope {
 private:
@@ -41,7 +41,7 @@ public:
     //return success/failure of insertion
     bool insertSymbol(const char* ident, TYPE_INFO info) {
         SymbolTable& current = table.back();
-        return current.insert(std::pair<const char*, TYPE_INFO>(ident, info)).second;
+        return current.insert(std::pair<std::string, TYPE_INFO>(ident, info)).second;
     }
 
     bool symbolDeclared(const char* ident) {
