@@ -139,7 +139,7 @@ N_VARDEC : N_IDENT N_IDENTLST T_COLON N_TYPE
 
 N_IDENT : T_IDENT
 {
-    ident_buffer.push_front($1);
+    ident_buffer.push_back($1);
     $$.name = $1;  //Might need anther element in stuct
     printRule("N_IDENT", "T_IDENT");
 }
