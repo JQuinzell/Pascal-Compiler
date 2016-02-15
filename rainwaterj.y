@@ -38,7 +38,7 @@ public:
 
     void pushScope() { table.push_back(SymbolTable()); printf("\n___Entering new scope...\n\n"); }
 
-    void popScope() { table.pop_back(); printf("___Exiting scope...\n");}
+    void popScope() { table.pop_back(); printf("\n___Exiting scope...\n\n");}
 
     //return success/failure of insertion
     bool insertSymbol(const char* ident, TYPE_INFO info) {
@@ -87,7 +87,7 @@ char* text;
 N_START : N_PROG 
 {
     printRule("N_START", "N_PROG");
-    printf("\n---- Completed parsing ----\n\n\n");
+    printf("\n---- Completed parsing ----\n\n");
     return 0;
 }
 
