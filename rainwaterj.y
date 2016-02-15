@@ -568,6 +568,8 @@ void fillSymbolTable(TYPE_INFO info) {
     for (std::list<char*>::iterator i = ident_buffer.begin(); i != ident_buffer.end(); ++i)
     {
         char* ident = *i;
+        bool multiplyDeclared = programScope.symbolDeclared(ident);
+        
         programScope.insertSymbol(ident, info);
         if(info.type != ARRAY) 
             printf("___Adding %s to symbol table with type %s\n", ident, name);
@@ -577,6 +579,11 @@ void fillSymbolTable(TYPE_INFO info) {
                 info.startIndex, 
                 info.endIndex, 
                 getTypeName(info.baseType).c_str());
+
+        if(multiplyDeclared) {
+            printf("Line %d: Multiply defined identifier\n", numLines);
+            exit(0);
+        }
     }
 
     ident_buffer = std::list<char*>();
