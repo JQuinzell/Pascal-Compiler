@@ -38,6 +38,8 @@ public:
 
     void pushScope() { table.push_back(SymbolTable()); printf("___Entering new scope...\n"); }
 
+    void popScope() { table.pop_back(); printf("___Exiting scope...\n");}
+
     //return success/failure of insertion
     bool insertSymbol(const char* ident, TYPE_INFO info) {
         SymbolTable& current = table.back();
