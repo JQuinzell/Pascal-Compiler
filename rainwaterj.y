@@ -44,17 +44,6 @@ public:
         return current.insert(std::pair<const char*, TYPE_INFO>(ident, info)).second;
     }
 
-    TYPE_INFO findSymbol(const char* ident) {
-        SymbolTable& current = table.back();
-        std::map<const char*, TYPE_INFO>::iterator it;
-        it = current.find(ident);
-        if(it != current.end()) {
-            return it->second;
-        } else {
-            return TYPE_INFO();
-        }
-    }
-
     bool symbolDeclared(const char* ident) {
         for (std::vector<SymbolTable>::reverse_iterator scope = table.rbegin(); scope != table.rend(); ++scope)
             if(scope->count(ident) > 0) return true;   
@@ -569,7 +558,7 @@ void fillSymbolTable(TYPE_INFO info) {
     {
         char* ident = *i;
         bool multiplyDeclared = programScope.symbolDeclared(ident);
-        
+
         programScope.insertSymbol(ident, info);
         if(info.type != ARRAY) 
             printf("___Adding %s to symbol table with type %s\n", ident, name);
