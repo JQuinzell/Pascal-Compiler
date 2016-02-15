@@ -101,8 +101,8 @@ N_PROG : N_PROGLBL { programScope.pushScope(); } T_IDENT T_SCOLON
     ident_buffer.push_back($3);
     TYPE_INFO t;
     t.type = PROGRAM;
-    fillSymbolTable(t);
     printRule("N_PROG", "N_PROGLBL T_IDENT T_SCOLON N_BLOCK T_DOT");
+    fillSymbolTable(t);
 }
 N_BLOCK T_DOT
 
