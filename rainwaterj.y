@@ -96,10 +96,9 @@ N_PROGLBL : T_PROG
     printRule("N_PROGLBL", "T_PROG");
 }
 
-N_PROG : N_PROGLBL T_IDENT T_SCOLON
+N_PROG : N_PROGLBL { programScope.pushScope(); } T_IDENT T_SCOLON
 {
-    programScope.pushScope();
-    ident_buffer.push_back($2);
+    ident_buffer.push_back($3);
     TYPE_INFO t;
     t.type = PROGRAM;
     fillSymbolTable(t);
