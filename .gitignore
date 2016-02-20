@@ -1,4 +1,4 @@
-*.out
+a.out
 *.yy.c
 *.tab.c
 test.cpp
