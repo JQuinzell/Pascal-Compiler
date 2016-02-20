@@ -9,6 +9,7 @@
 int numLines = 1;
 void printToken(const char* tokenType, const char* lexeme);
 void printError(const char* error, const char* lexeme);
+void parseError(const char* error);
 void printRule(const char*, const char*);
 bool validateIntConst(const char* intconst);
 void findIdentifier(const char* ident);
@@ -539,6 +540,11 @@ void printToken(const char* tokenType, const char* lexeme) {
 
 void printError(const char* error, const char* lexeme) {
     printf("**** %s: %s\n",error, yytext);
+}
+
+void parseError(const char* error) {
+    printf("Line %d: %s\n", numLines, error);
+    exit(1);
 }
 
 int yyerror(const char *s) {
