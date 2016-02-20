@@ -1,4 +1,5 @@
 a.out
+*.zip
 *.yy.c
 *.tab.c
 test.cpp
