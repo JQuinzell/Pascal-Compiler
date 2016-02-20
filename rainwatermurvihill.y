@@ -13,6 +13,7 @@ void printRule(const char*, const char*);
 bool validateIntConst(const char* intconst);
 void findIdentifier(const char* ident);
 int yyerror(const char *s);
+bool logging = false;
 const char* maxint = "2147483647";
 
 enum TOKEN_TYPE { PROGRAM, ARRAY, INTEGER, CHAR, BOOLEAN, PROCEDURE, UNDECLARED };
@@ -37,9 +38,9 @@ private:
 public:
     ProgramScope(): table(0) {}
 
-    void pushScope() { table.push_back(SymbolTable()); printf("\n___Entering new scope...\n\n"); }
+    void pushScope() { table.push_back(SymbolTable()); if(logging) printf("\n___Entering new scope...\n\n"); }
 
-    void popScope() { table.pop_back(); printf("\n___Exiting scope...\n\n");}
+    void popScope() { table.pop_back(); if(logging) printf("\n___Exiting scope...\n\n");}
 
     //return success/failure of insertion
     bool insertSymbol(const char* ident, TYPE_INFO info) {
@@ -533,7 +534,7 @@ N_BOOLCONST : T_TRUE
 extern FILE *yyin;
 
 void printToken(const char* tokenType, const char* lexeme) {
-    printf("TOKEN: %s LEXEME:\t%s\n", tokenType, lexeme);
+    if(logging) printf("TOKEN: %s LEXEME:\t%s\n", tokenType, lexeme);
 }
 
 void printError(const char* error, const char* lexeme) {
@@ -575,9 +576,9 @@ void fillSymbolTable(TYPE_INFO info) {
 
         programScope.insertSymbol(ident, info);
         if(info.type != ARRAY) 
-            printf("___Adding %s to symbol table with type %s\n", ident, name.c_str());
+            if(logging) printf("___Adding %s to symbol table with type %s\n", ident, name.c_str());
         else 
-            printf("___Adding %s to symbol table with type ARRAY %d .. %d OF %s\n",
+            if(logging) printf("___Adding %s to symbol table with type ARRAY %d .. %d OF %s\n",
                 ident, 
                 info.startIndex, 
                 info.endIndex, 
@@ -613,7 +614,7 @@ std::string getTypeName(TOKEN_TYPE type) {
 }
 
 void printRule(const char* lhs, const char* rhs) {
-    printf("%s -> %s\n", lhs, rhs);
+    if(logging) printf("%s -> %s\n", lhs, rhs);
 }
 
 int main() {
