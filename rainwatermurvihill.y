@@ -13,7 +13,6 @@ void parseError(const char* error);
 void printRule(const char*, const char*);
 bool validateIntConst(const char* intconst);
 void findIdentifier(const char* ident);
-void verifyArrayIndexes(const int x, const int y);
 int yyerror(const char *s);
 bool logging = false;
 const char* maxint = "2147483647";
@@ -29,6 +28,7 @@ struct TYPE_INFO {
 };
 
 void verifyArrayType(TYPE_INFO);
+void verifyArrayIndexes(const int x, const int y);
 
 TOKEN_TYPE verifySymbol(const char* ident);
 
