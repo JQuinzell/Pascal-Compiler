@@ -362,10 +362,12 @@ N_OUTPUT : N_EXPR
 
 N_CONDITION : T_IF N_EXPR T_THEN N_STMT
 {
+    verifyBoolExpr($2);
     printRule("N_CONDITION", "T_IF N_EXPR T_THEN N_STMT");
 }
 | T_IF N_EXPR T_THEN N_STMT T_ELSE N_STMT
 {
+    verifyBoolExpr($2);
     printRule("N_CONDITION", "T_IF N_EXPR T_THEN N_STMT T_ELSE N_STMT");
 }
 
@@ -429,6 +431,7 @@ N_FACTOR : N_SIGN N_VARIABLE
 }
 | T_NOT N_FACTOR
 {
+    verifyBoolExpr($2);
     printRule("N_FACTOR", "T_NOT N_FACTOR");
 }
 
