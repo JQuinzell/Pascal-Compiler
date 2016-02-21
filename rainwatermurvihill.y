@@ -27,6 +27,8 @@ struct TYPE_INFO {
     TOKEN_TYPE baseType; 
 };
 
+TOKEN_TYPE verifySymbol(const char* ident);
+
 std::string getTypeName(TOKEN_TYPE type);
 void fillSymbolTable(TYPE_INFO);
 
@@ -58,7 +60,22 @@ public:
         for (std::vector<SymbolTable>::reverse_iterator scope = table.rbegin(); scope != table.rend(); ++scope)
             if(scope->count(ident) > 0) return true;   
         return false;
-    }
+        }
+
+    TYPE_INFO verifySymbol(const char* ident) {
+        std::map<std::string, TYPE_INFO>::iterator it;
+        for (std::vector<SymbolTable>::iterator scope = table.begin(); scope != table.end(); ++scope)
+        {
+             it = scope->find(ident);
+             if (it != scope->end())
+              {
+               return it->second; 
+               }
+        }
+         
+        //call error function
+      }
+
 };
 
 ProgramScope programScope;
@@ -83,7 +100,7 @@ char* text;
 %token T_INT T_PROG T_PROC T_BEGIN T_END T_WHILE T_DO T_IF T_READ T_WRITE T_TRUE T_FALSE T_LBRACK T_RBRACK T_NEWLINE
 %token T_SCOLON T_COLON T_LPAREN T_RPAREN T_COMMA T_DOT T_DOTDOT T_ARRAY T_CHARCONST T_IDENT T_INTCONST T_UNKNOWN
 %type <text> T_IDENT T_INTCONST 
-%type <typeInfo> N_ARRAY N_IDENT N_TYPE N_IDX N_INTCONST N_IDXRANGE N_SIMPLE N_SIGN
+%type <typeInfo> N_ARRAY N_IDENT N_TYPE N_IDX N_INTCONST N_IDXRANGE N_SIMPLE N_SIGN N_VARIDENT N_ENTIREVAR N_ARRAYVAR
 %nonassoc T_THEN
 %nonassoc T_ELSE
 
@@ -482,22 +499,31 @@ N_VARIABLE : N_ENTIREVAR
 
 N_IDXVAR : N_ARRAYVAR T_LBRACK N_EXPR T_RBRACK
 {
+    if (verifySymbol($1.name) != ARRAY)
+      {
+       parseError("Indexed variable must be of array type");
+       //error message
+      }
+
     printRule("N_IDXVAR", "N_ARRAYVAR T_LBRACK N_EXPR T_RBRACK");
 }
 
 N_ARRAYVAR : N_ENTIREVAR
 {
+    $$.name = $1.name;    
     printRule("N_ARRAYVAR", "N_ENTIREVAR");
 }
 
 N_ENTIREVAR : N_VARIDENT
 {
+    $$.name = $1.name;
     printRule("N_ENTIREVAR", "N_VARIDENT");
 }
 
 N_VARIDENT :  T_IDENT
 {
     printRule("N_VARIDENT", "T_IDENT");
+    $$.name = $1;
     findIdentifier($1);
 }
 
@@ -552,6 +578,11 @@ int yyerror(const char *s) {
   return(1);
 }
 
+TOKEN_TYPE verifySymbol(const char* ident){
+return programScope.verifySymbol(ident).baseType;
+} 
+
+
 bool validateIntConst(const char* intconst) {
     for(int idx = 0; intconst[idx]; ++idx){
         const char digit = intconst[idx];
@@ -564,6 +595,7 @@ bool validateIntConst(const char* intconst) {
 
     return true;
 }
+
 
 void findIdentifier(const char* ident) {
     if(!programScope.findSymbol(ident)) {
