@@ -29,7 +29,7 @@ struct TYPE_INFO {
 
 void verifyArrayType(TYPE_INFO);
 void verifyArrayIndexes(const int x, const int y);
-void verifyBoolExpr(int);
+void verifyBoolExpr(TOKEN_TYPE);
 
 TOKEN_TYPE verifySymbol(const char* ident);
 
@@ -96,7 +96,7 @@ extern "C" {
 
 %union {
 TYPE_INFO typeInfo;
-int type;
+TOKEN_TYPE type;
 char* text;
 };
 
@@ -678,7 +678,7 @@ void verifyArrayIndexes(const int x, const int y){
         }
 }
 
-void verifyBoolExpr(int type) {
+void verifyBoolExpr(TOKEN_TYPE type) {
     if(type != BOOLEAN) parseError("Expression must be of type boolean");
 }
 
