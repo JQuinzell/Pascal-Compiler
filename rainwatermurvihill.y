@@ -29,6 +29,7 @@ struct TYPE_INFO {
 
 void verifyArrayType(TYPE_INFO);
 void verifyArrayIndexes(const int x, const int y);
+void verifyBoolExpr(int);
 
 TOKEN_TYPE verifySymbol(const char* ident);
 
@@ -368,7 +369,7 @@ N_CONDITION : T_IF N_EXPR T_THEN N_STMT
     printRule("N_CONDITION", "T_IF N_EXPR T_THEN N_STMT T_ELSE N_STMT");
 }
 
-N_WHILE : T_WHILE N_EXPR T_DO N_STMT
+N_WHILE : T_WHILE N_EXPR {verifyBoolExpr($2);} T_DO N_STMT
 {
     printRule("N_WHILE", "T_WHILE N_EXPR T_DO N_STMT");
 }
@@ -675,6 +676,10 @@ void verifyArrayIndexes(const int x, const int y){
         {
           parseError("Start index must be less than or equal to end index of array");
         }
+}
+
+void verifyBoolExpr(int type) {
+    if(type != BOOLEAN) parseError("Expression must be of type boolean");
 }
 
 
