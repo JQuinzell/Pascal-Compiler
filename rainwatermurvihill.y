@@ -27,6 +27,8 @@ struct TYPE_INFO {
     TOKEN_TYPE baseType; 
 };
 
+void verifyArrayType(TYPE_INFO);
+
 TOKEN_TYPE verifySymbol(const char* ident);
 
 std::string getTypeName(TOKEN_TYPE type);
@@ -62,18 +64,18 @@ public:
         return false;
         }
 
-    TYPE_INFO verifySymbol(const char* ident) {
+    TYPE_INFO getSymbol(const char* ident) {
         std::map<std::string, TYPE_INFO>::iterator it;
         for (std::vector<SymbolTable>::iterator scope = table.begin(); scope != table.end(); ++scope)
         {
-             it = scope->find(ident);
-             if (it != scope->end())
-              {
-               return it->second; 
-               }
+            it = scope->find(ident);
+            if (it != scope->end())
+            {
+              return it->second; 
+            }
         }
-         
-        //call error function
+
+        return TYPE_INFO(); //?         
       }
 
 };
@@ -499,12 +501,8 @@ N_VARIABLE : N_ENTIREVAR
 
 N_IDXVAR : N_ARRAYVAR T_LBRACK N_EXPR T_RBRACK
 {
-    if (verifySymbol($1.name) != ARRAY)
-      {
-       parseError("Indexed variable must be of array type");
-       //error message
-      }
-
+    TYPE_INFO var = programScope.getSymbol($1.name);
+    verifyArrayType(var);
     printRule("N_IDXVAR", "N_ARRAYVAR T_LBRACK N_EXPR T_RBRACK");
 }
 
@@ -577,11 +575,6 @@ int yyerror(const char *s) {
   printf("Line %d: syntax error\n", numLines);
   return(1);
 }
-
-TOKEN_TYPE verifySymbol(const char* ident){
-return programScope.verifySymbol(ident).baseType;
-} 
-
 
 bool validateIntConst(const char* intconst) {
     for(int idx = 0; intconst[idx]; ++idx){
@@ -662,4 +655,8 @@ int main() {
 
   // printf("%d lines processed\n", numLines);
   return 0;
+}
+
+void verifyArrayType(TYPE_INFO var) {
+    if (var.type != ARRAY) parseError("Indexed variable must be of array type");
 }
