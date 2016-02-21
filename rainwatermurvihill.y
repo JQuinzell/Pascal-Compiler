@@ -13,6 +13,7 @@ void parseError(const char* error);
 void printRule(const char*, const char*);
 bool validateIntConst(const char* intconst);
 void findIdentifier(const char* ident);
+void verifyArrayIndexes(const int x, const int y);
 int yyerror(const char *s);
 bool logging = false;
 const char* maxint = "2147483647";
@@ -189,6 +190,7 @@ N_TYPE : N_SIMPLE
     $$.type = ARRAY; 
     $$.startIndex = $1.startIndex; 
     $$.endIndex = $1.endIndex;
+    verifyArrayIndexes($1.startIndex, $1.endIndex);
     $$.baseType = $1.baseType;   	
     printRule("N_TYPE", "N_ARRAY");
 }
@@ -660,3 +662,12 @@ int main() {
 void verifyArrayType(TYPE_INFO var) {
     if (var.type != ARRAY) parseError("Indexed variable must be of array type");
 }
+
+void verifyArrayIndexes(const int x, const int y){
+    if (y <= x)
+        {
+          parseError("Start index must be less than or equal to end index of array");
+        }
+}
+
+
