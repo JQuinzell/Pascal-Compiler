@@ -449,6 +449,7 @@ N_FACTOR : N_SIGN N_VARIABLE
 }
 | T_LPAREN N_EXPR T_RPAREN
 {
+    $$ = $2;
     printRule("N_FACTOR", "T_LPAREN N_EXPR T_RPAREN");
 }
 | T_NOT N_FACTOR
