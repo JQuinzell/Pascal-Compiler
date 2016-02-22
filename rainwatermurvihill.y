@@ -117,7 +117,7 @@ char* text;
 %token T_SCOLON T_COLON T_LPAREN T_RPAREN T_COMMA T_DOT T_DOTDOT T_ARRAY T_CHARCONST T_IDENT T_INTCONST T_UNKNOWN
 %type <text> T_IDENT T_INTCONST 
 %type <type> N_FACTOR N_TERM N_SIMPLEEXPR N_EXPR N_MULTOP N_MULTOPLST N_CONST N_INPUTVAR
-%type <typeInfo> N_ARRAY N_IDENT N_TYPE N_IDX N_INTCONST N_IDXRANGE N_SIMPLE N_SIGN N_VARIDENT N_ENTIREVAR N_ARRAYVAR N_VARIABLE
+%type <typeInfo> N_ARRAY N_IDENT N_TYPE N_IDX N_INTCONST N_IDXRANGE N_SIMPLE N_SIGN N_VARIDENT N_ENTIREVAR N_ARRAYVAR N_VARIABLE N_IDXVAR
 %nonassoc T_THEN
 %nonassoc T_ELSE
 
@@ -537,12 +537,14 @@ N_VARIABLE : N_ENTIREVAR
 }
 | N_IDXVAR
 {
+    $$ = $1;
+    $$.type = $$.baseType;
     printRule("N_VARIABLE", "N_IDXVAR");
 }
 
 N_IDXVAR : N_ARRAYVAR T_LBRACK N_EXPR T_RBRACK
 {
-    
+    $$ = $1;
     TYPE_INFO var = programScope.getSymbol($1.name);
     verifyArrayType(var);
     verifyIndexExpr($3);
@@ -551,8 +553,7 @@ N_IDXVAR : N_ARRAYVAR T_LBRACK N_EXPR T_RBRACK
 
 N_ARRAYVAR : N_ENTIREVAR
 {
-    $$.name = $1.name;
-    //$$.type = ARRAY;    
+    $$ = $1;
     printRule("N_ARRAYVAR", "N_ENTIREVAR");
 }
 
