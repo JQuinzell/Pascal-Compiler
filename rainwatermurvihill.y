@@ -31,7 +31,12 @@ void verifyArrayType(TYPE_INFO);
 void verifyArrayIndexes(const int x, const int y);
 void verifyBoolExpr(TOKEN_TYPE);
 void verifyIntExpr(TOKEN_TYPE);
+<<<<<<< HEAD
 void verifyArrayAssign(TOKEN_TYPE type);
+=======
+void verifySameType(TOKEN_TYPE, TOKEN_TYPE);
+
+>>>>>>> 2ecab8dcc7eae07cb73f58d1ef25e6e0383e15e5
 TOKEN_TYPE verifySymbol(const char* ident);
 
 std::string getTypeName(TOKEN_TYPE type);
@@ -412,6 +417,7 @@ N_TERM : N_FACTOR N_MULTOPLST
 N_MULTOPLST : N_MULTOP N_FACTOR N_MULTOPLST
 {
     $$ = $1; // will probably need to be based on a check
+    verifySameType($1, $2);
     printRule("N_MULTOPLST", "N_MULTOP N_FACTOR N_MULTOPLST");
 }
 | /* epsilon */
@@ -701,6 +707,7 @@ void verifyBoolExpr(TOKEN_TYPE type) {
 void verifyIntExpr(TOKEN_TYPE type) {
     if(type != INTEGER) parseError("Expression must be of type integer");
 }
+<<<<<<< HEAD
 //=======
 
 void verifyArrayAssign(TOKEN_TYPE type) {
@@ -715,3 +722,10 @@ void verifyOutputExpr(TOKEN_TYPE type) {
 */
 
 //>>>>>>> Stashed changes
+=======
+
+void verifySameType(TOKEN_TYPE lhs, TOKEN_TYPE rhs) {
+    if(lhs == INTEGER) verifyIntExpr(rhs);
+    if(lhs == BOOLEAN) verifyBoolExpr(rhs);
+}
+//>>>>>>> 2ecab8dcc7eae07cb73f58d1ef25e6e0383e15e5
