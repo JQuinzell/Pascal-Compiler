@@ -35,6 +35,7 @@ void verifyArrayAssign(TOKEN_TYPE type);
 void verifySameType(TOKEN_TYPE, TOKEN_TYPE);
 void verifySameTypeVar(TOKEN_TYPE, TOKEN_TYPE);
 void verifySameTypeRel(TOKEN_TYPE, TOKEN_TYPE);
+void verifyInput(TOKEN_TYPE);
 
 TOKEN_TYPE verifySymbol(const char* ident);
 
@@ -110,7 +111,7 @@ char* text;
 %token T_INT T_PROG T_PROC T_BEGIN T_END T_WHILE T_DO T_IF T_READ T_WRITE T_TRUE T_FALSE T_LBRACK T_RBRACK T_NEWLINE
 %token T_SCOLON T_COLON T_LPAREN T_RPAREN T_COMMA T_DOT T_DOTDOT T_ARRAY T_CHARCONST T_IDENT T_INTCONST T_UNKNOWN
 %type <text> T_IDENT T_INTCONST 
-%type <type> N_FACTOR N_TERM N_SIMPLEEXPR N_EXPR N_MULTOP N_MULTOPLST N_CONST
+%type <type> N_FACTOR N_TERM N_SIMPLEEXPR N_EXPR N_MULTOP N_MULTOPLST N_CONST N_INPUTVAR
 %type <typeInfo> N_ARRAY N_IDENT N_TYPE N_IDX N_INTCONST N_IDXRANGE N_SIMPLE N_SIGN N_VARIDENT N_ENTIREVAR N_ARRAYVAR N_VARIABLE
 %nonassoc T_THEN
 %nonassoc T_ELSE
@@ -331,6 +332,7 @@ N_PROCIDENT : T_IDENT
 
 N_READ : T_READ T_LPAREN N_INPUTVAR N_INPUTLST T_RPAREN
 {
+    verifyInput($3);
     printRule("N_READ", "T_READ T_LPAREN N_INPUTVAR N_INPUTLST T_RPAREN");
 }
 
@@ -345,6 +347,7 @@ N_INPUTLST : T_COMMA N_INPUTVAR N_INPUTLST
 
 N_INPUTVAR : N_VARIABLE
 {
+    $$ = $1.type;
     printRule("N_INPUTVAR", "N_VARIABLE");
 }
 
@@ -727,4 +730,8 @@ void verifySameTypeVar(TOKEN_TYPE var, TOKEN_TYPE rhs) {
 
 void verifySameTypeRel(TOKEN_TYPE lhs, TOKEN_TYPE rhs) {
     if(lhs != rhs) parseError("Expressions must both be int, or both char, or both boolean");
+}
+
+void verifyInput(TOKEN_TYPE input) {
+    if(input != CHAR && input != INTEGER) parseError("Input variable must be of type integer or char");
 }
