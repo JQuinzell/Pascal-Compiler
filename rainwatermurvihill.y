@@ -31,7 +31,7 @@ void verifyArrayType(TYPE_INFO);
 void verifyArrayIndexes(const int x, const int y);
 void verifyBoolExpr(TOKEN_TYPE);
 void verifyIntExpr(TOKEN_TYPE);
-
+void verifyArrayAssign(TOKEN_TYPE type);
 TOKEN_TYPE verifySymbol(const char* ident);
 
 std::string getTypeName(TOKEN_TYPE type);
@@ -48,7 +48,7 @@ public:
 
     void pushScope() { table.push_back(SymbolTable()); if(logging) printf("\n___Entering new scope...\n\n"); }
 
-    void popScope() { table.pop_back(); if(logging) printf("\n___Exiting scope...\n\n");}
+    void popScope() { table.pop_back(); /*if(logging)*/ printf("\n___Exiting scope...\n\n");}
 
     //return success/failure of insertion
     bool insertSymbol(const char* ident, TYPE_INFO info) {
@@ -310,6 +310,7 @@ N_STMT : N_ASSIGN
 
 N_ASSIGN : N_VARIABLE T_ASSIGN N_EXPR
 {
+    verifyArrayAssign($1.type);
     printRule("N_ASSIGN", "N_VARIABLE T_ASSIGN N_EXPR");
 }
 
@@ -530,7 +531,8 @@ N_IDXVAR : N_ARRAYVAR T_LBRACK N_EXPR T_RBRACK
 
 N_ARRAYVAR : N_ENTIREVAR
 {
-    $$.name = $1.name;    
+    $$.name = $1.name;
+    //$$.type = ARRAY;    
     printRule("N_ARRAYVAR", "N_ENTIREVAR");
 }
 
@@ -691,9 +693,25 @@ void verifyArrayIndexes(const int x, const int y){
 }
 
 void verifyBoolExpr(TOKEN_TYPE type) {
+    printf("%s\n",getTypeName(type).c_str());
     if(type != BOOLEAN) parseError("Expression must be of type boolean");
 }
 
+//<<<<<<< Updated upstream
 void verifyIntExpr(TOKEN_TYPE type) {
     if(type != INTEGER) parseError("Expression must be of type integer");
 }
+//=======
+
+void verifyArrayAssign(TOKEN_TYPE type) {
+    printf("%s\n",getTypeName(type).c_str());
+    if (type == ARRAY) parseError("Cannot make assignment to an array");
+}
+/*
+void verifyOutputExpr(TOKEN_TYPE type) {
+   if (type != CHAR || type != INTEGER) parseError 
+}
+
+*/
+
+//>>>>>>> Stashed changes
