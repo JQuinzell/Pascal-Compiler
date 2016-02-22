@@ -532,7 +532,6 @@ N_RELOP : T_LT
 N_VARIABLE : N_ENTIREVAR
 {
     $$ = $1;
-    verifyProc($$.type);
     printRule("N_VARIABLE", "N_ENTIREVAR");
 }
 | N_IDXVAR
@@ -557,6 +556,7 @@ N_ARRAYVAR : N_ENTIREVAR
 N_ENTIREVAR : N_VARIDENT
 {
     $$ = programScope.getSymbol($1.name);
+    verifyProc($$.type);
     $$.name = $1.name;
     printRule("N_ENTIREVAR", "N_VARIDENT");
 }
