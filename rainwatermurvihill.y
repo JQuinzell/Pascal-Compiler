@@ -454,6 +454,7 @@ N_FACTOR : N_SIGN N_VARIABLE
 }
 | T_NOT N_FACTOR
 {
+    $$ = $2;
     verifyBoolExpr($2);
     printRule("N_FACTOR", "T_NOT N_FACTOR");
 }
