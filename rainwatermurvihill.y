@@ -38,6 +38,7 @@ void verifySameType(TOKEN_TYPE, TOKEN_TYPE);
 void verifySameTypeVar(TOKEN_TYPE, TOKEN_TYPE);
 void verifySameTypeRel(TOKEN_TYPE, TOKEN_TYPE);
 void verifyInput(TOKEN_TYPE);
+void verifyProc(TOKEN_TYPE);
 
 void verifyIndexExpr(TOKEN_TYPE type);
 
@@ -532,6 +533,7 @@ N_RELOP : T_LT
 N_VARIABLE : N_ENTIREVAR
 {
     $$ = $1;
+    verifyProc($$.type);
     printRule("N_VARIABLE", "N_ENTIREVAR");
 }
 | N_IDXVAR
@@ -754,3 +756,9 @@ void verifySameTypeRel(TOKEN_TYPE lhs, TOKEN_TYPE rhs) {
 void verifyInput(TOKEN_TYPE input) {
     if(input != CHAR && input != INTEGER) parseError("Input variable must be of type integer or char");
 }
+
+
+void verifyProc(TOKEN_TYPE t) {
+    if(t == PROCEDURE) parseError("Procedure/variable mismatch");
+}
+
