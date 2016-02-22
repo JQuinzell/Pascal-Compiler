@@ -33,6 +33,7 @@ void verifyBoolExpr(TOKEN_TYPE);
 void verifyIntExpr(TOKEN_TYPE);
 void verifyArrayAssign(TOKEN_TYPE type);
 void verifySameType(TOKEN_TYPE, TOKEN_TYPE);
+void verifySameTypeVar(TOKEN_TYPE, TOKEN_TYPE);
 
 TOKEN_TYPE verifySymbol(const char* ident);
 
@@ -313,6 +314,7 @@ N_STMT : N_ASSIGN
 N_ASSIGN : N_VARIABLE T_ASSIGN N_EXPR
 {
     verifyArrayAssign($1.type);
+    verifySameTypeVar($1.type, $3);
     printRule("N_ASSIGN", "N_VARIABLE T_ASSIGN N_EXPR");
 }
 
@@ -712,4 +714,8 @@ void verifyArrayAssign(TOKEN_TYPE type) {
 void verifySameType(TOKEN_TYPE lhs, TOKEN_TYPE rhs) {
     if(lhs == INTEGER) verifyIntExpr(rhs);
     if(lhs == BOOLEAN) verifyBoolExpr(rhs);
+}
+
+void verifySameTypeVar(TOKEN_TYPE var, TOKEN_TYPE rhs) {
+    if(var != rhs) parseError("Expression must be of same type as variable");
 }
