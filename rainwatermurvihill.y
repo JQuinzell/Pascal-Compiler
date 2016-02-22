@@ -412,6 +412,7 @@ N_TERM : N_FACTOR N_MULTOPLST
 N_MULTOPLST : N_MULTOP N_FACTOR N_MULTOPLST
 {
     $$ = $1; // will probably need to be based on a check
+    verifySameType($1, $2);
     printRule("N_MULTOPLST", "N_MULTOP N_FACTOR N_MULTOPLST");
 }
 | /* epsilon */
