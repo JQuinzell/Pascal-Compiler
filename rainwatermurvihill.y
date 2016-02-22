@@ -421,6 +421,7 @@ N_MULTOPLST : N_MULTOP N_FACTOR N_MULTOPLST
 N_FACTOR : N_SIGN N_VARIABLE
 {
     $$ = $2.type;
+    printf("%d\n", $$);
     if($1.type == INTEGER) verifyIntExpr($$);
     printRule("N_FACTOR", "N_SIGN N_VARIABLE");
 }
@@ -536,7 +537,7 @@ N_ARRAYVAR : N_ENTIREVAR
 
 N_ENTIREVAR : N_VARIDENT
 {
-    $$.name = $1.name;
+    $$ = programScope.getSymbol($1.name);
     printRule("N_ENTIREVAR", "N_VARIDENT");
 }
 
