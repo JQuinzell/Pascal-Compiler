@@ -32,10 +32,13 @@ void verifyArrayIndexes(const int x, const int y);
 void verifyBoolExpr(TOKEN_TYPE);
 void verifyIntExpr(TOKEN_TYPE);
 void verifyArrayAssign(TOKEN_TYPE type);
+void verifyOutputExpr(TOKEN_TYPE type);
+void verifyArrayAssign(TOKEN_TYPE type);
 void verifySameType(TOKEN_TYPE, TOKEN_TYPE);
 void verifySameTypeVar(TOKEN_TYPE, TOKEN_TYPE);
 void verifySameTypeRel(TOKEN_TYPE, TOKEN_TYPE);
 void verifyInput(TOKEN_TYPE);
+
 
 TOKEN_TYPE verifySymbol(const char* ident);
 
@@ -367,6 +370,7 @@ N_OUTPUTLST : T_COMMA N_OUTPUT N_OUTPUTLST
 
 N_OUTPUT : N_EXPR
 {
+    verifyOutputExpr($1);
     printRule("N_OUTPUT", "N_EXPR");
 }
 
@@ -715,6 +719,8 @@ void verifyIntExpr(TOKEN_TYPE type) {
     if(type != INTEGER) parseError("Expression must be of type integer");
 }
 
+
+
 void verifyArrayAssign(TOKEN_TYPE type) {
     if (type == ARRAY) parseError("Cannot make assignment to an array");
 }
@@ -723,6 +729,14 @@ void verifySameType(TOKEN_TYPE lhs, TOKEN_TYPE rhs) {
     if(lhs == INTEGER) verifyIntExpr(rhs);
     if(lhs == BOOLEAN) verifyBoolExpr(rhs);
 }
+
+
+void verifyOutputExpr(TOKEN_TYPE type) {
+    //printf("%s\n",getTypeName(type).c_str());
+    if (type != INTEGER || type != CHAR) parseError("Output expression must be of type integer or char");
+ 
+}
+
 
 void verifySameTypeVar(TOKEN_TYPE var, TOKEN_TYPE rhs) {
     if(var != rhs) parseError("Expression must be of same type as variable");
