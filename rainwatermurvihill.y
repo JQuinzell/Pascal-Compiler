@@ -31,13 +31,14 @@ void verifyArrayType(TYPE_INFO);
 void verifyArrayIndexes(const int x, const int y);
 void verifyBoolExpr(TOKEN_TYPE);
 void verifyIntExpr(TOKEN_TYPE);
-//<<<<<<< HEAD
 void verifyArrayAssign(TOKEN_TYPE type);
 void verifyOutputExpr(TOKEN_TYPE type);
-//=======
+void verifyArrayAssign(TOKEN_TYPE type);
 void verifySameType(TOKEN_TYPE, TOKEN_TYPE);
+void verifySameTypeVar(TOKEN_TYPE, TOKEN_TYPE);
+void verifySameTypeRel(TOKEN_TYPE, TOKEN_TYPE);
 
-//>>>>>>> 2ecab8dcc7eae07cb73f58d1ef25e6e0383e15e5
+
 TOKEN_TYPE verifySymbol(const char* ident);
 
 std::string getTypeName(TOKEN_TYPE type);
@@ -112,7 +113,7 @@ char* text;
 %token T_INT T_PROG T_PROC T_BEGIN T_END T_WHILE T_DO T_IF T_READ T_WRITE T_TRUE T_FALSE T_LBRACK T_RBRACK T_NEWLINE
 %token T_SCOLON T_COLON T_LPAREN T_RPAREN T_COMMA T_DOT T_DOTDOT T_ARRAY T_CHARCONST T_IDENT T_INTCONST T_UNKNOWN
 %type <text> T_IDENT T_INTCONST 
-%type <type> N_FACTOR N_TERM N_SIMPLEEXPR N_EXPR N_MULTOP N_MULTOPLST
+%type <type> N_FACTOR N_TERM N_SIMPLEEXPR N_EXPR N_MULTOP N_MULTOPLST N_CONST
 %type <typeInfo> N_ARRAY N_IDENT N_TYPE N_IDX N_INTCONST N_IDXRANGE N_SIMPLE N_SIGN N_VARIDENT N_ENTIREVAR N_ARRAYVAR N_VARIABLE
 %nonassoc T_THEN
 %nonassoc T_ELSE
@@ -317,6 +318,7 @@ N_STMT : N_ASSIGN
 N_ASSIGN : N_VARIABLE T_ASSIGN N_EXPR
 {
     verifyArrayAssign($1.type);
+    verifySameTypeVar($1.type, $3);
     printRule("N_ASSIGN", "N_VARIABLE T_ASSIGN N_EXPR");
 }
 
@@ -392,6 +394,8 @@ N_EXPR : N_SIMPLEEXPR
 }
 | N_SIMPLEEXPR N_RELOP N_SIMPLEEXPR
 {
+    $$ = BOOLEAN;
+    verifySameTypeRel($1, $3);
     printRule("N_EXPR", "N_SIMPLEEXPR N_RELOP N_SIMPLEEXPR");
 }
 
@@ -435,6 +439,7 @@ N_FACTOR : N_SIGN N_VARIABLE
 }
 | N_CONST
 {
+    $$ = $1;
     printRule("N_FACTOR", "N_CONST");
 }
 | T_LPAREN N_EXPR T_RPAREN
@@ -532,8 +537,8 @@ N_VARIABLE : N_ENTIREVAR
 
 N_IDXVAR : N_ARRAYVAR T_LBRACK N_EXPR T_RBRACK
 {
-    //TYPE_INFO var = programScope.getSymbol($1.name);
-    //verifyArrayType(var);
+    TYPE_INFO var = programScope.getSymbol($1.name);
+    verifyArrayType(var);
     printRule("N_IDXVAR", "N_ARRAYVAR T_LBRACK N_EXPR T_RBRACK");
 }
 
@@ -547,6 +552,7 @@ N_ARRAYVAR : N_ENTIREVAR
 N_ENTIREVAR : N_VARIDENT
 {
     $$ = programScope.getSymbol($1.name);
+    $$.name = $1.name;
     printRule("N_ENTIREVAR", "N_VARIDENT");
 }
 
@@ -559,14 +565,17 @@ N_VARIDENT :  T_IDENT
 
 N_CONST : N_INTCONST
 {
+    $$ = INTEGER;
     printRule("N_CONST", "N_INTCONST");
 }
 | T_CHARCONST
 {
+    $$ = CHAR;
     printRule("N_CONST", "T_CHARCONST");
 }
 | N_BOOLCONST
 {
+    $$ = BOOLEAN;
     printRule("N_CONST", "N_BOOLCONST");
 }
 
@@ -631,7 +640,6 @@ void findIdentifier(const char* ident) {
 
 void fillSymbolTable(TYPE_INFO info) {
     std::string name = getTypeName(info.type);
-
     for (std::list<char*>::iterator i = ident_buffer.begin(); i != ident_buffer.end(); ++i)
     {
         char* ident = *i;
@@ -701,21 +709,18 @@ void verifyArrayIndexes(const int x, const int y){
 }
 
 void verifyBoolExpr(TOKEN_TYPE type) {
-    printf("%s\n",getTypeName(type).c_str());
     if(type != BOOLEAN) parseError("Expression must be of type boolean");
 }
-
 
 void verifyIntExpr(TOKEN_TYPE type) {
     if(type != INTEGER) parseError("Expression must be of type integer");
 }
 
 
+
 void verifyArrayAssign(TOKEN_TYPE type) {
-    printf("%s\n",getTypeName(type).c_str());
     if (type == ARRAY) parseError("Cannot make assignment to an array");
 }
-
 
 void verifySameType(TOKEN_TYPE lhs, TOKEN_TYPE rhs) {
     if(lhs == INTEGER) verifyIntExpr(rhs);
@@ -724,11 +729,17 @@ void verifySameType(TOKEN_TYPE lhs, TOKEN_TYPE rhs) {
 
 
 void verifyOutputExpr(TOKEN_TYPE type) {
-    printf("%s\n",getTypeName(type).c_str());
+    //printf("%s\n",getTypeName(type).c_str());
     if (type != INTEGER || type != CHAR) parseError("Output expression must be of type integer or char");
  
 }
 
 
+void verifySameTypeVar(TOKEN_TYPE var, TOKEN_TYPE rhs) {
+    if(var != rhs) parseError("Expression must be of same type as variable");
+}
 
+void verifySameTypeRel(TOKEN_TYPE lhs, TOKEN_TYPE rhs) {
+    if(lhs != rhs) parseError("Expressions must both be int, or both char, or both boolean");
+}
 
