@@ -707,7 +707,6 @@ void verifyIntExpr(TOKEN_TYPE type) {
 }
 
 void verifyArrayAssign(TOKEN_TYPE type) {
-    printf("%s\n",getTypeName(type).c_str());
     if (type == ARRAY) parseError("Cannot make assignment to an array");
 }
 
