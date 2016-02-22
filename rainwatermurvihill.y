@@ -548,6 +548,7 @@ N_ARRAYVAR : N_ENTIREVAR
 N_ENTIREVAR : N_VARIDENT
 {
     $$ = programScope.getSymbol($1.name);
+    $$.name = $1.name;
     printRule("N_ENTIREVAR", "N_VARIDENT");
 }
 
@@ -635,7 +636,6 @@ void findIdentifier(const char* ident) {
 
 void fillSymbolTable(TYPE_INFO info) {
     std::string name = getTypeName(info.type);
-
     for (std::list<char*>::iterator i = ident_buffer.begin(); i != ident_buffer.end(); ++i)
     {
         char* ident = *i;
