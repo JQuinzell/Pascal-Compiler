@@ -31,6 +31,7 @@ void verifyArrayType(TYPE_INFO);
 void verifyArrayIndexes(const int x, const int y);
 void verifyBoolExpr(TOKEN_TYPE);
 void verifyIntExpr(TOKEN_TYPE);
+void verifySameType(TOKEN_TYPE, TOKEN_TYPE);
 
 TOKEN_TYPE verifySymbol(const char* ident);
 
@@ -696,4 +697,9 @@ void verifyBoolExpr(TOKEN_TYPE type) {
 
 void verifyIntExpr(TOKEN_TYPE type) {
     if(type != INTEGER) parseError("Expression must be of type integer");
+}
+
+void verifySameType(TOKEN_TYPE lhs, TOKEN_TYPE rhs) {
+    if(lhs == INTEGER) verifyIntExpr(rhs);
+    if(lhs == BOOLEAN) verifyBoolExpr(rhs);
 }
