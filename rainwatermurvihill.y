@@ -735,7 +735,7 @@ void verifySameType(TOKEN_TYPE lhs, TOKEN_TYPE rhs) {
 
 void verifyOutputExpr(TOKEN_TYPE type) {
     //printf("%s\n",getTypeName(type).c_str());
-    if (type != INTEGER || type != CHAR) parseError("Output expression must be of type integer or char");
+    if (type != INTEGER && type != CHAR) parseError("Output expression must be of type integer or char");
  
 }
 
