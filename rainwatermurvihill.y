@@ -34,6 +34,7 @@ void verifyIntExpr(TOKEN_TYPE);
 void verifyArrayAssign(TOKEN_TYPE type);
 void verifySameType(TOKEN_TYPE, TOKEN_TYPE);
 void verifySameTypeVar(TOKEN_TYPE, TOKEN_TYPE);
+void verifySameTypeRel(TOKEN_TYPE, TOKEN_TYPE);
 
 TOKEN_TYPE verifySymbol(const char* ident);
 
@@ -390,6 +391,7 @@ N_EXPR : N_SIMPLEEXPR
 | N_SIMPLEEXPR N_RELOP N_SIMPLEEXPR
 {
     $$ = BOOLEAN;
+    verifySameTypeRel($1, $3);
     printRule("N_EXPR", "N_SIMPLEEXPR N_RELOP N_SIMPLEEXPR");
 }
 
@@ -721,4 +723,8 @@ void verifySameType(TOKEN_TYPE lhs, TOKEN_TYPE rhs) {
 
 void verifySameTypeVar(TOKEN_TYPE var, TOKEN_TYPE rhs) {
     if(var != rhs) parseError("Expression must be of same type as variable");
+}
+
+void verifySameTypeRel(TOKEN_TYPE lhs, TOKEN_TYPE rhs) {
+    if(lhs != rhs) parseError("Expressions must both be int, or both char, or both boolean");
 }
