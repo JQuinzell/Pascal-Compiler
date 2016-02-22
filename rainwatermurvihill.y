@@ -39,6 +39,7 @@ void verifySameTypeVar(TOKEN_TYPE, TOKEN_TYPE);
 void verifySameTypeRel(TOKEN_TYPE, TOKEN_TYPE);
 void verifyInput(TOKEN_TYPE);
 
+void verifyIndexExpr(TOKEN_TYPE type);
 
 TOKEN_TYPE verifySymbol(const char* ident);
 
@@ -540,8 +541,10 @@ N_VARIABLE : N_ENTIREVAR
 
 N_IDXVAR : N_ARRAYVAR T_LBRACK N_EXPR T_RBRACK
 {
+    
     TYPE_INFO var = programScope.getSymbol($1.name);
     verifyArrayType(var);
+    verifyIndexExpr($3);
     printRule("N_IDXVAR", "N_ARRAYVAR T_LBRACK N_EXPR T_RBRACK");
 }
 
@@ -733,11 +736,13 @@ void verifySameType(TOKEN_TYPE lhs, TOKEN_TYPE rhs) {
 
 void verifyOutputExpr(TOKEN_TYPE type) {
     //printf("%s\n",getTypeName(type).c_str());
-    if (type != INTEGER || type != CHAR) parseError("Output expression must be of type integer or char");
+    if (type != INTEGER && type != CHAR) parseError("Output expression must be of type integer or char");
  
 }
 
-
+void verifyIndexExpr(TOKEN_TYPE type){
+    if (type != INTEGER) parseError("Index expression must be of type integer");
+}
 void verifySameTypeVar(TOKEN_TYPE var, TOKEN_TYPE rhs) {
     if(var != rhs) parseError("Expression must be of same type as variable");
 }
