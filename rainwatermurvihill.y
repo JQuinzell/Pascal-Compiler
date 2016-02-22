@@ -702,7 +702,6 @@ void verifyArrayIndexes(const int x, const int y){
 }
 
 void verifyBoolExpr(TOKEN_TYPE type) {
-    printf("%s\n",getTypeName(type).c_str());
     if(type != BOOLEAN) parseError("Expression must be of type boolean");
 }
 
