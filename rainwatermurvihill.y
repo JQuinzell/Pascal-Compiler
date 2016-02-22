@@ -51,7 +51,7 @@ public:
 
     void pushScope() { table.push_back(SymbolTable()); if(logging) printf("\n___Entering new scope...\n\n"); }
 
-    void popScope() { table.pop_back(); /*if(logging)*/ printf("\n___Exiting scope...\n\n");}
+    void popScope() { table.pop_back(); if(logging) printf("\n___Exiting scope...\n\n");}
 
     //return success/failure of insertion
     bool insertSymbol(const char* ident, TYPE_INFO info) {
