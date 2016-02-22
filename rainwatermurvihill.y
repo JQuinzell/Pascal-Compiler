@@ -30,6 +30,7 @@ struct TYPE_INFO {
 void verifyArrayType(TYPE_INFO);
 void verifyArrayIndexes(const int x, const int y);
 void verifyBoolExpr(TOKEN_TYPE);
+void verifyIntExpr(TOKEN_TYPE);
 
 TOKEN_TYPE verifySymbol(const char* ident);
 
@@ -105,7 +106,7 @@ char* text;
 %token T_INT T_PROG T_PROC T_BEGIN T_END T_WHILE T_DO T_IF T_READ T_WRITE T_TRUE T_FALSE T_LBRACK T_RBRACK T_NEWLINE
 %token T_SCOLON T_COLON T_LPAREN T_RPAREN T_COMMA T_DOT T_DOTDOT T_ARRAY T_CHARCONST T_IDENT T_INTCONST T_UNKNOWN
 %type <text> T_IDENT T_INTCONST 
-%type <type> N_FACTOR N_TERM N_SIMPLEEXPR N_EXPR
+%type <type> N_FACTOR N_TERM N_SIMPLEEXPR N_EXPR N_MULTOP N_MULTOPLST
 %type <typeInfo> N_ARRAY N_IDENT N_TYPE N_IDX N_INTCONST N_IDXRANGE N_SIMPLE N_SIGN N_VARIDENT N_ENTIREVAR N_ARRAYVAR N_VARIABLE
 %nonassoc T_THEN
 %nonassoc T_ELSE
@@ -409,6 +410,7 @@ N_TERM : N_FACTOR N_MULTOPLST
 
 N_MULTOPLST : N_MULTOP N_FACTOR N_MULTOPLST
 {
+    $$ = $1; // will probably need to be based on a check
     printRule("N_MULTOPLST", "N_MULTOP N_FACTOR N_MULTOPLST");
 }
 | /* epsilon */
@@ -419,6 +421,7 @@ N_MULTOPLST : N_MULTOP N_FACTOR N_MULTOPLST
 N_FACTOR : N_SIGN N_VARIABLE
 {
     $$ = $2.type;
+    if($1.type == INTEGER) verifyIntExpr($$);
     printRule("N_FACTOR", "N_SIGN N_VARIABLE");
 }
 | N_CONST
@@ -437,16 +440,19 @@ N_FACTOR : N_SIGN N_VARIABLE
 
 N_SIGN : T_PLUS
 {
+    $$.type = INTEGER;
     $$.startIndex = 1;
     printRule("N_SIGN", "T_PLUS");
 }
 | T_MINUS
 {
+    $$.type = INTEGER;
     $$.startIndex = -1;
     printRule("N_SIGN", "T_MINUS");
 }
 | /* epsilon */
 {
+    $$.type = UNDECLARED;
     $$.startIndex = 1;
     printRule("N_SIGN", "epsilon");
 }
@@ -466,14 +472,17 @@ N_ADDOP : T_PLUS
 
 N_MULTOP : T_MULT
 {
+    $$ = INTEGER;
     printRule("N_MULTOP", "T_MULT");
 }
 | T_DIV
 {
+    $$ = INTEGER;
     printRule("N_MULTOP", "T_DIV");
 }
 | T_AND
 {
+    $$ = BOOLEAN;
     printRule("N_MULTOP", "T_AND");
 }
 
@@ -685,4 +694,6 @@ void verifyBoolExpr(TOKEN_TYPE type) {
     if(type != BOOLEAN) parseError("Expression must be of type boolean");
 }
 
-
+void verifyIntExpr(TOKEN_TYPE type) {
+    if(type != INTEGER) parseError("Expression must be of type integer");
+}
