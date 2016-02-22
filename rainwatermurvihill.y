@@ -31,12 +31,13 @@ void verifyArrayType(TYPE_INFO);
 void verifyArrayIndexes(const int x, const int y);
 void verifyBoolExpr(TOKEN_TYPE);
 void verifyIntExpr(TOKEN_TYPE);
-<<<<<<< HEAD
+//<<<<<<< HEAD
 void verifyArrayAssign(TOKEN_TYPE type);
-=======
+void verifyOutputExpr(TOKEN_TYPE type);
+//=======
 void verifySameType(TOKEN_TYPE, TOKEN_TYPE);
 
->>>>>>> 2ecab8dcc7eae07cb73f58d1ef25e6e0383e15e5
+//>>>>>>> 2ecab8dcc7eae07cb73f58d1ef25e6e0383e15e5
 TOKEN_TYPE verifySymbol(const char* ident);
 
 std::string getTypeName(TOKEN_TYPE type);
@@ -53,7 +54,7 @@ public:
 
     void pushScope() { table.push_back(SymbolTable()); if(logging) printf("\n___Entering new scope...\n\n"); }
 
-    void popScope() { table.pop_back(); /*if(logging)*/ printf("\n___Exiting scope...\n\n");}
+    void popScope() { table.pop_back(); if(logging) printf("\n___Exiting scope...\n\n");}
 
     //return success/failure of insertion
     bool insertSymbol(const char* ident, TYPE_INFO info) {
@@ -364,6 +365,7 @@ N_OUTPUTLST : T_COMMA N_OUTPUT N_OUTPUTLST
 
 N_OUTPUT : N_EXPR
 {
+    verifyOutputExpr($1);
     printRule("N_OUTPUT", "N_EXPR");
 }
 
@@ -530,8 +532,8 @@ N_VARIABLE : N_ENTIREVAR
 
 N_IDXVAR : N_ARRAYVAR T_LBRACK N_EXPR T_RBRACK
 {
-    TYPE_INFO var = programScope.getSymbol($1.name);
-    verifyArrayType(var);
+    //TYPE_INFO var = programScope.getSymbol($1.name);
+    //verifyArrayType(var);
     printRule("N_IDXVAR", "N_ARRAYVAR T_LBRACK N_EXPR T_RBRACK");
 }
 
@@ -703,29 +705,30 @@ void verifyBoolExpr(TOKEN_TYPE type) {
     if(type != BOOLEAN) parseError("Expression must be of type boolean");
 }
 
-//<<<<<<< Updated upstream
+
 void verifyIntExpr(TOKEN_TYPE type) {
     if(type != INTEGER) parseError("Expression must be of type integer");
 }
-<<<<<<< HEAD
-//=======
+
 
 void verifyArrayAssign(TOKEN_TYPE type) {
     printf("%s\n",getTypeName(type).c_str());
     if (type == ARRAY) parseError("Cannot make assignment to an array");
 }
-/*
-void verifyOutputExpr(TOKEN_TYPE type) {
-   if (type != CHAR || type != INTEGER) parseError 
-}
 
-*/
-
-//>>>>>>> Stashed changes
-=======
 
 void verifySameType(TOKEN_TYPE lhs, TOKEN_TYPE rhs) {
     if(lhs == INTEGER) verifyIntExpr(rhs);
     if(lhs == BOOLEAN) verifyBoolExpr(rhs);
 }
-//>>>>>>> 2ecab8dcc7eae07cb73f58d1ef25e6e0383e15e5
+
+
+void verifyOutputExpr(TOKEN_TYPE type) {
+    printf("%s\n",getTypeName(type).c_str());
+    if (type != INTEGER || type != CHAR) parseError("Output expression must be of type integer or char");
+ 
+}
+
+
+
+
