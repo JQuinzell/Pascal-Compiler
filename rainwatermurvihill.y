@@ -699,7 +699,14 @@ void printRule(const char* lhs, const char* rhs) {
     if(logging) printf("%s -> %s\n", lhs, rhs);
 }
 
-int main() {
+int main(int argc, char** argv) {
+    
+    if (argc < 2) {
+      printf("You must specify a file in the command line!\n");
+      exit(1);
+    }
+    yyin = fopen(argv[1], "r");
+
   do {
   yyparse();
   } while (!feof(yyin));

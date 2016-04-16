@@ -1,0 +1,6 @@
+rm rainwaterj.tab.c
+flex rainwaterj.l
+bison rainwaterj.y
+g++ rainwaterj.tab.c
+
+./test.sh $1
