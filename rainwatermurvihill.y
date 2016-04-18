@@ -5,6 +5,8 @@
 #include <map>
 #include <vector>
 #include <list>
+#include <iostream>
+using namespace std;
 
 int numLines = 1;
 void printToken(const char* tokenType, const char* lexeme);
@@ -14,7 +16,7 @@ void printRule(const char*, const char*);
 bool validateIntConst(const char* intconst);
 void findIdentifier(const char* ident);
 int yyerror(const char *s);
-bool logging = false;
+bool logging = true;
 const char* maxint = "2147483647";
 
 enum TOKEN_TYPE { PROGRAM, ARRAY, INTEGER, CHAR, BOOLEAN, PROCEDURE, UNDECLARED };
@@ -700,6 +702,7 @@ void printRule(const char* lhs, const char* rhs) {
 }
 
 int main(int argc, char** argv) {
+    cout << "Hi?" << endl;
     
     if (argc < 2) {
       printf("You must specify a file in the command line!\n");
