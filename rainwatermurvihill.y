@@ -18,6 +18,7 @@ void findIdentifier(const char* ident);
 int yyerror(const char *s);
 bool logging = false;
 const char* maxint = "2147483647";
+vector<string> oalCode(0);
 
 enum TOKEN_TYPE { PROGRAM, ARRAY, INTEGER, CHAR, BOOLEAN, PROCEDURE, UNDECLARED };
 
@@ -130,7 +131,7 @@ char* text;
 N_START : N_PROG 
 {
     printRule("N_START", "N_PROG");
-    printf("\n---- Completed parsing ----\n\n");
+    // printf("\n---- Completed parsing ----\n\n");
     return 0;
 }
 
@@ -141,6 +142,7 @@ N_PROGLBL : T_PROG
 
 N_PROG : N_PROGLBL { programScope.pushScope(); } T_IDENT T_SCOLON
 {
+    oalCode.push_back("init L.0, 20, L.1, L.2, L.3");
     ident_buffer.push_back($3);
     TYPE_INFO t;
     t.type = PROGRAM;
@@ -702,7 +704,6 @@ void printRule(const char* lhs, const char* rhs) {
 }
 
 int main(int argc, char** argv) {
-   
     if (argc < 2) {
       printf("You must specify a file in the command line!\n");
       exit(1);
@@ -713,7 +714,13 @@ int main(int argc, char** argv) {
   yyparse();
   } while (!feof(yyin));
 
+  for (std::vector<string>::iterator code = oalCode.begin(); code != oalCode.end(); ++code)
+  {
+      cout << *code << endl;
+  }
+
   // printf("%d lines processed\n", numLines);
+
   return 0;
 }
 
