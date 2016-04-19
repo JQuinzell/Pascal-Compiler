@@ -273,6 +273,7 @@ UNKNOWN     .
                 }
 
 {CHARCONST}     {
+                    yylval.text = strdup(yytext);
                     printToken("T_CHARCONST", yytext);
                     return T_CHARCONST;
                 }
