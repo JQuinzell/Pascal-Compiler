@@ -9,6 +9,8 @@
 using namespace std;
 
 int numLines = 1;
+int globalSize = 0;
+int level = 0;
 void printToken(const char* tokenType, const char* lexeme);
 void printError(const char* error, const char* lexeme);
 void parseError(const char* error);
@@ -142,17 +144,18 @@ N_PROGLBL : T_PROG
 
 N_PROG : N_PROGLBL { programScope.pushScope(); } T_IDENT T_SCOLON
 {
-    oalCode.push_back("init L.0, 20, L.1, L.2, L.3");
+    cout << "init L.0, 20, L.1, L.2, L.3" << endl;
     ident_buffer.push_back($3);
     TYPE_INFO t;
     t.type = PROGRAM;
     printRule("N_PROG", "N_PROGLBL T_IDENT T_SCOLON N_BLOCK T_DOT");
     fillSymbolTable(t);
 }
-N_BLOCK T_DOT
+N_VARDECPART N_PROCDECPART { cout << "L0:\nbss " << 20 + globalSize << "\nL.2:\nL.3" << endl; } N_STMTPART T_DOT
 
-N_BLOCK : N_VARDECPART N_PROCDECPART N_STMTPART
+N_BLOCK : {level++;} N_VARDECPART N_PROCDECPART N_STMTPART
 {
+    level--;
     printRule("N_BLOCK", " N_VARDECPART N_PROCDECPART N_STMTPART");
     programScope.popScope();
 }
@@ -178,6 +181,7 @@ N_VARDECLST : N_VARDEC T_SCOLON N_VARDECLST
 N_VARDEC : N_IDENT N_IDENTLST T_COLON N_TYPE
 {
     // insertSymbol($1, $4);// assuming N_IDENTLST -> Epsilon 
+    if(level == 0) globalSize++;
     printRule("N_VARDEC", "N_IDENT N_IDENTLST T_COLON N_TYPE");
     fillSymbolTable($4);
 }
@@ -208,6 +212,7 @@ N_TYPE : N_SIMPLE
     $$.type = ARRAY; 
     $$.startIndex = $1.startIndex; 
     $$.endIndex = $1.endIndex;
+    if(level == 0) globalSize += $1.endIndex - 1;
     verifyArrayIndexes($1.startIndex, $1.endIndex);
     $$.baseType = $1.baseType;   	
     printRule("N_TYPE", "N_ARRAY");
@@ -261,6 +266,7 @@ N_PROCDECPART : N_PROCDEC T_SCOLON N_PROCDECPART
 
 N_PROCDEC : N_PROCHDR N_BLOCK
 {
+    if(level == 0) globalSize++;
     printRule("N_PROCDEC", "N_PROCHDR N_BLOCK");
 }
 
