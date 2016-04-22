@@ -120,7 +120,7 @@ char* text;
 %token T_WSPACE T_ASSIGN T_MULT T_PLUS T_MINUS T_DIV T_AND T_OR T_NOT T_LT T_GT T_LE T_GE T_EQ T_NE T_VAR T_OF T_BOOL T_CHAR 
 %token T_INT T_PROG T_PROC T_BEGIN T_END T_WHILE T_DO T_IF T_READ T_WRITE T_TRUE T_FALSE T_LBRACK T_RBRACK T_NEWLINE
 %token T_SCOLON T_COLON T_LPAREN T_RPAREN T_COMMA T_DOT T_DOTDOT T_ARRAY T_CHARCONST T_IDENT T_INTCONST T_UNKNOWN
-%type <text> T_IDENT T_INTCONST 
+%type <text> T_IDENT T_INTCONST T_CHARCONST
 %type <type> N_FACTOR N_TERM N_SIMPLEEXPR N_EXPR N_MULTOP N_MULTOPLST N_CONST N_INPUTVAR
 %type <typeInfo> N_ARRAY N_IDENT N_TYPE N_IDX N_INTCONST N_IDXRANGE N_SIMPLE N_SIGN N_VARIDENT N_ENTIREVAR N_ARRAYVAR N_VARIABLE N_IDXVAR
 %nonassoc T_THEN
@@ -380,9 +380,11 @@ N_OUTPUTLST : T_COMMA N_OUTPUT N_OUTPUTLST
     printRule("N_OUTPUTLST", "epsilon");
 }
 
-N_OUTPUT : N_EXPR
+N_OUTPUT : {printf("lc");} N_EXPR
 {
-    verifyOutputExpr($1);
+    verifyOutputExpr($2);
+    if ($2 == INTEGER) {printf("iwrite\n");} 
+    if ($2 == CHAR) {printf("cwrite\n");} 
     printRule("N_OUTPUT", "N_EXPR");
 }
 
@@ -588,9 +590,11 @@ N_CONST : N_INTCONST
 {
     $$ = INTEGER;
     printRule("N_CONST", "N_INTCONST");
+    printf(" %d\n",$1.startIndex);
 }
 | T_CHARCONST
 {
+    printf(" %d\n", static_cast<int>($1[1]));
     $$ = CHAR;
     printRule("N_CONST", "T_CHARCONST");
 }
@@ -608,10 +612,12 @@ N_INTCONST : N_SIGN T_INTCONST //we Need a Conversion!!!!!
 
 N_BOOLCONST : T_TRUE
 {
+    printf("1");
     printRule("N_BOOLCONST", "T_TRUE");
 }
 | T_FALSE
 {
+    printf("0");
     printRule("N_BOOLCONST", "T_FALSE");
 }
 
