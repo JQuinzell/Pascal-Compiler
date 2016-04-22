@@ -133,7 +133,11 @@ char* text;
 N_START : N_PROG 
 {
     printRule("N_START", "N_PROG");
-    // printf("\n---- Completed parsing ----\n\n");
+    printf("halt\n");
+    printf("L.1:\n");
+    printf("bss 500\n");
+    printf("end\n");
+    
     return 0;
 }
 
@@ -151,7 +155,7 @@ N_PROG : N_PROGLBL { programScope.pushScope(); } T_IDENT T_SCOLON
     printRule("N_PROG", "N_PROGLBL T_IDENT T_SCOLON N_BLOCK T_DOT");
     fillSymbolTable(t);
 }
-N_VARDECPART N_PROCDECPART { cout << "L0:\nbss " << 20 + globalSize << "\nL.2:\nL.3" << endl; } N_STMTPART T_DOT
+N_VARDECPART N_PROCDECPART { cout << "L.0:\nbss " << 20 + globalSize << "\nL.2:\nL.3:" << endl; } N_STMTPART T_DOT
 
 N_BLOCK : {level++;} N_VARDECPART N_PROCDECPART N_STMTPART
 {
