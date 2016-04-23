@@ -39,6 +39,7 @@ struct TYPE_INFO {
     int level;
     int offset;
     int size;
+    int label;
 };
 
 void loadVariable(TYPE_INFO info) {
@@ -310,6 +311,7 @@ N_PROCHDR : T_PROC T_IDENT T_SCOLON
     printRule("N_PROCHDR", "T_PROC T_IDENT T_SCOLON");
     TYPE_INFO t;
     t.type = PROCEDURE;
+    t.label = label;
     ident_buffer.push_back($2);
     fillSymbolTable(t);
     programScope.pushScope();
@@ -381,6 +383,9 @@ N_PROCSTMT : N_PROCIDENT
 
 N_PROCIDENT : T_IDENT
 {
+    //generate jump to proc
+    TYPE_INFO proc = programScope.getSymbol($1);
+    cout << "js L." << proc.label << endl;
     printRule("N_PROCIDENT", "T_IDENT");
 }
 
