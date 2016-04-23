@@ -13,6 +13,7 @@ int typeSize = 1;
 int globalSize = 0;
 int level = 0;
 int offset = 20;
+int label = 4;
 void printToken(const char* tokenType, const char* lexeme);
 void printError(const char* error, const char* lexeme);
 void parseError(const char* error);
@@ -98,7 +99,7 @@ public:
               return it->second; 
             }
         }
-
+        cout << "PORTAL TO HELL" << endl;
         return TYPE_INFO(); //?         
       }
 
@@ -120,6 +121,7 @@ extern "C" {
 TYPE_INFO typeInfo;
 TOKEN_TYPE type;
 char* text;
+int lab;
 };
 
 
@@ -127,6 +129,7 @@ char* text;
 %token T_INT T_PROG T_PROC T_BEGIN T_END T_WHILE T_DO T_IF T_READ T_WRITE T_TRUE T_FALSE T_LBRACK T_RBRACK T_NEWLINE
 %token T_SCOLON T_COLON T_LPAREN T_RPAREN T_COMMA T_DOT T_DOTDOT T_ARRAY T_CHARCONST T_IDENT T_INTCONST T_UNKNOWN
 %type <text> T_IDENT T_INTCONST T_CHARCONST
+%type <lab> N_PROCHDR N_PROCDECPART N_PROCDEC 
 %type <type> N_FACTOR N_TERM N_SIMPLEEXPR N_EXPR N_MULTOP N_MULTOPLST N_CONST N_INPUTVAR
 %type <typeInfo> N_ARRAY N_IDENT N_TYPE N_IDX N_INTCONST N_IDXRANGE N_SIMPLE N_SIGN N_VARIDENT N_ENTIREVAR N_ARRAYVAR N_VARIABLE N_IDXVAR
 %nonassoc T_THEN
@@ -161,9 +164,11 @@ N_PROG : N_PROGLBL { programScope.pushScope(); } T_IDENT T_SCOLON
     printRule("N_PROG", "N_PROGLBL T_IDENT T_SCOLON N_BLOCK T_DOT");
     fillSymbolTable(t);
 }
-N_VARDECPART N_PROCDECPART { cout << "L.0:\nbss " << 20 + globalSize << "\nL.2:\nL.3:" << endl; } N_STMTPART T_DOT
+N_VARDECPART { cout << "L.0:\nbss " << 20 + globalSize << "\nL.2:" << endl; } N_PROCDECPART {cout << "L.3:\n";} N_STMTPART T_DOT
 
-N_BLOCK : {level++; offset=0;} N_VARDECPART N_PROCDECPART N_STMTPART
+N_BLOCK : {level++; offset=0;  $<lab>$ = label; 
+    label++;}  N_VARDECPART N_PROCDECPART {printf("L.%d:\n", $<lab>1);} N_STMTPART
+
 {
     level--;
     offset = 0;
@@ -270,7 +275,7 @@ N_SIMPLE : T_INT
 }
 
 N_PROCDECPART : N_PROCDEC T_SCOLON N_PROCDECPART
-{
+{  
     printRule("N_PROCDECPART", "N_PROCDEC T_SCOLON N_PROCDECPART");
 }
 | /* epsilon */
@@ -278,7 +283,7 @@ N_PROCDECPART : N_PROCDEC T_SCOLON N_PROCDECPART
     printRule("N_PROCDECPART", "epsilon");
 }
 
-N_PROCDEC : N_PROCHDR N_BLOCK
+N_PROCDEC : N_PROCHDR  N_BLOCK
 {
     if(level == 0) globalSize++;
     printRule("N_PROCDEC", "N_PROCHDR N_BLOCK");
@@ -286,6 +291,7 @@ N_PROCDEC : N_PROCHDR N_BLOCK
 
 N_PROCHDR : T_PROC T_IDENT T_SCOLON
 {
+   
     printRule("N_PROCHDR", "T_PROC T_IDENT T_SCOLON");
     TYPE_INFO t;
     t.type = PROCEDURE;
@@ -709,7 +715,7 @@ void fillSymbolTable(TYPE_INFO info) {
             exit(0);
         }
 
-        if(vardec) cout << ident << " - la " << info.offset << ", " << info.level << endl;
+        //if(vardec) cout << ident << " - la " << info.offset << ", " << info.level << endl;
     }
 
     ident_buffer = std::list<char*>();
