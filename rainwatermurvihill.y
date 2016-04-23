@@ -13,6 +13,7 @@ int globalSize = 0;
 int level = 0;
 int offset = 20;
 int label = 4;
+bool global = false;
 string relop = "";
 string arithop = "";
 void printToken(const char* tokenType, const char* lexeme);
@@ -175,7 +176,7 @@ N_PROG : N_PROGLBL { programScope.pushScope(); } T_IDENT T_SCOLON
     printRule("N_PROG", "N_PROGLBL T_IDENT T_SCOLON N_BLOCK T_DOT");
     fillSymbolTable(t);
 }
-N_VARDECPART { cout << "L.0:\nbss " << 20 + globalSize << "\nL.2:" << endl; } N_PROCDECPART {cout << "L.3:\n";} N_STMTPART T_DOT
+N_VARDECPART { cout << "L.0:\nbss " << 20 + globalSize << "\nL.2:" << endl; } N_PROCDECPART {cout << "L.3:\n"; global = true; } N_STMTPART T_DOT
 
 N_BLOCK : {level++; offset=0;  $<lab>$ = label; label++;}  N_VARDECPART N_PROCDECPART
           {
@@ -316,6 +317,7 @@ N_PROCHDR : T_PROC T_IDENT T_SCOLON
     TYPE_INFO t;
     t.type = PROCEDURE;
     t.label = label;
+    t.level = level;
     ident_buffer.push_back($2);
     fillSymbolTable(t);
     programScope.pushScope();
@@ -389,7 +391,9 @@ N_PROCIDENT : T_IDENT
 {
     //generate jump to proc
     TYPE_INFO proc = programScope.getSymbol($1);
+    if(!global) cout << "push " << proc.level + 1 << ", 0" << endl;
     cout << "js L." << proc.label << endl;
+    if(!global) cout << "pop " << proc.level + 1 << ", 0" << endl;
     printRule("N_PROCIDENT", "T_IDENT");
 }
 
@@ -753,9 +757,6 @@ void fillSymbolTable(TYPE_INFO info) {
             if(info.type == ARRAY) info.offset -= info.startIndex;
             info.level = level;
             offset += info.size;
-        } else {
-            info.offset = -1;
-            info.level = -1;
         }
 
         programScope.insertSymbol(ident, info);
