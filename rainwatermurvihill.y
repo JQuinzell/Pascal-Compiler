@@ -38,6 +38,10 @@ struct TYPE_INFO {
     int size;
 };
 
+void loadVariable(TYPE_INFO info) {
+ cout << "la " << info.offset << ", " << info.level << endl;
+}
+
 void verifyArrayType(TYPE_INFO);
 void verifyArrayIndexes(const int x, const int y);
 void verifyBoolExpr(TOKEN_TYPE);
@@ -344,6 +348,10 @@ N_STMT : N_ASSIGN
 
 N_ASSIGN : N_VARIABLE T_ASSIGN N_EXPR
 {
+    //variable loaded in assembly
+    //expr loaded in assembly
+    //call store
+    cout << "st" << endl;
     verifyArrayAssign($1.type);
     verifySameTypeVar($1.type, $3);
     printRule("N_ASSIGN", "N_VARIABLE T_ASSIGN N_EXPR");
@@ -561,6 +569,8 @@ N_RELOP : T_LT
 N_VARIABLE : N_ENTIREVAR
 {
     $$ = $1;
+    //load variable
+    loadVariable($1);
     printRule("N_VARIABLE", "N_ENTIREVAR");
 }
 | N_IDXVAR
@@ -570,13 +580,14 @@ N_VARIABLE : N_ENTIREVAR
     printRule("N_VARIABLE", "N_IDXVAR");
 }
 
-N_IDXVAR : N_ARRAYVAR T_LBRACK N_EXPR T_RBRACK
+N_IDXVAR : N_ARRAYVAR { loadVariable($1); } T_LBRACK N_EXPR T_RBRACK
 {
     $$ = $1;
     TYPE_INFO var = programScope.getSymbol($1.name);
     verifyArrayType(var);
-    verifyIndexExpr($3);
+    verifyIndexExpr($4);
     printRule("N_IDXVAR", "N_ARRAYVAR T_LBRACK N_EXPR T_RBRACK");
+    cout << "add" << endl; //add array offset
 }
 
 N_ARRAYVAR : N_ENTIREVAR
@@ -604,6 +615,7 @@ N_CONST : N_INTCONST
 {
     $$ = INTEGER;
     printRule("N_CONST", "N_INTCONST");
+    cout << "lc " << $1.startIndex << endl;
     // printf(" %d\n",$1.startIndex);
 }
 | T_CHARCONST
@@ -688,6 +700,7 @@ void fillSymbolTable(TYPE_INFO info) {
 
         if(vardec) {
             info.offset = offset;
+            if(info.type == ARRAY) info.offset -= info.startIndex;
             info.level = level;
             offset += info.size;
         } else {
