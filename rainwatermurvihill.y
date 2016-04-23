@@ -436,8 +436,10 @@ N_CONDITION : T_IF N_EXPR T_THEN N_STMT
     printRule("N_CONDITION", "T_IF N_EXPR T_THEN N_STMT T_ELSE N_STMT");
 }
 
-N_WHILE : T_WHILE N_EXPR {verifyBoolExpr($2);} T_DO N_STMT
+N_WHILE : {printf("L.%d:\n",label); $<lab>$ = label; label++;} T_WHILE { $<lab>$ = label; label++;} N_EXPR {printf("jf L.%d\n",$<lab>3);verifyBoolExpr($4);} T_DO N_STMT 
 {
+    printf("jp L.%d\n",$<lab>1); 
+    printf("L.%d:\n",$<lab>3);
     printRule("N_WHILE", "T_WHILE N_EXPR T_DO N_STMT");
 }
 
