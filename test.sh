@@ -5,9 +5,9 @@ for f in input/*; do
 	./a.out $f > oalOutput.oal
 	file=${f%.txt}
 	echo Testing ${file##*/}
-	diff -w oalOutput.oal oalExamples/${file##*/}.oal
-	# oal oalOutput.oal > output.txt
-	# diff -w output.txt output/${f##*/}.txt.out
+	# diff -w oalOutput.oal oalExamples/${file##*/}.oal
+	oal oalOutput.oal > output.txt
+	diff -w output.txt output/${file##*/}.txt.out
 done
 
 else
