@@ -191,6 +191,7 @@ N_VARDECPART : T_VAR N_VARDEC T_SCOLON N_VARDECLST
 }
 | /*epsilon*/
 {
+    $$ = 0;
     printRule("N_VARDECPART", "epsilon");
 }
 
