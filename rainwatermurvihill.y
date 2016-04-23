@@ -9,7 +9,6 @@
 using namespace std;
 
 int numLines = 1;
-int typeSize = 1;
 int globalSize = 0;
 int level = 0;
 int offset = 20;
@@ -36,6 +35,7 @@ struct TYPE_INFO {
     TOKEN_TYPE baseType;
     int level;
     int offset;
+    int size;
 };
 
 void verifyArrayType(TYPE_INFO);
@@ -192,7 +192,7 @@ N_VARDECLST : N_VARDEC T_SCOLON N_VARDECLST
 N_VARDEC : N_IDENT N_IDENTLST T_COLON N_TYPE
 {
     // insertSymbol($1, $4);// assuming N_IDENTLST -> Epsilon 
-    if(level == 0) globalSize += ident_buffer.size() * typeSize;
+    if(level == 0) globalSize += ident_buffer.size() * $4.size;
     printRule("N_VARDEC", "N_IDENT N_IDENTLST T_COLON N_TYPE");
     vardec = true;
     fillSymbolTable($4);
@@ -219,14 +219,14 @@ N_TYPE : N_SIMPLE
 {
     $$.type = $1.type;
     printRule("N_TYPE", "N_SIMPLE");
-    typeSize = 1;
+    $$.size = 1;
 }
 | N_ARRAY
 {
     $$.type = ARRAY; 
     $$.startIndex = $1.startIndex; 
     $$.endIndex = $1.endIndex;
-    typeSize = $1.endIndex - $1.startIndex + 1;
+    $$.size = $1.endIndex - $1.startIndex + 1;
     verifyArrayIndexes($1.startIndex, $1.endIndex);
     $$.baseType = $1.baseType;   	
     printRule("N_TYPE", "N_ARRAY");
@@ -687,8 +687,9 @@ void fillSymbolTable(TYPE_INFO info) {
         bool multiplyDeclared = programScope.symbolDeclared(ident);
 
         if(vardec) {
-            info.offset = offset++;
+            info.offset = offset;
             info.level = level;
+            offset += info.size;
         } else {
             info.offset = -1;
             info.level = -1;
