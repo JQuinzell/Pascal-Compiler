@@ -11,6 +11,7 @@ using namespace std;
 int numLines = 1;
 int globalSize = 0;
 int level = 0;
+int offset = 20;
 void printToken(const char* tokenType, const char* lexeme);
 void printError(const char* error, const char* lexeme);
 void parseError(const char* error);
@@ -18,6 +19,8 @@ void printRule(const char*, const char*);
 bool validateIntConst(const char* intconst);
 void findIdentifier(const char* ident);
 int yyerror(const char *s);
+bool vardec;
+
 bool logging = false;
 const char* maxint = "2147483647";
 vector<string> oalCode(0);
@@ -29,7 +32,9 @@ struct TYPE_INFO {
     int startIndex;
     int endIndex; 
     char* name;
-    TOKEN_TYPE baseType; 
+    TOKEN_TYPE baseType;
+    int level;
+    int offset;
 };
 
 void verifyArrayType(TYPE_INFO);
@@ -153,9 +158,10 @@ N_PROG : N_PROGLBL { programScope.pushScope(); } T_IDENT T_SCOLON
 }
 N_VARDECPART N_PROCDECPART { cout << "L0:\nbss " << 20 + globalSize << "\nL.2:\nL.3" << endl; } N_STMTPART T_DOT
 
-N_BLOCK : {level++;} N_VARDECPART N_PROCDECPART N_STMTPART
+N_BLOCK : {level++; offset=0;} N_VARDECPART N_PROCDECPART N_STMTPART
 {
     level--;
+    offset = 0;
     printRule("N_BLOCK", " N_VARDECPART N_PROCDECPART N_STMTPART");
     programScope.popScope();
 }
@@ -183,7 +189,9 @@ N_VARDEC : N_IDENT N_IDENTLST T_COLON N_TYPE
     // insertSymbol($1, $4);// assuming N_IDENTLST -> Epsilon 
     if(level == 0) globalSize++;
     printRule("N_VARDEC", "N_IDENT N_IDENTLST T_COLON N_TYPE");
+    vardec = true;
     fillSymbolTable($4);
+    vardec = false;
 }
 
 N_IDENT : T_IDENT
@@ -204,7 +212,7 @@ N_IDENTLST : T_COMMA N_IDENT N_IDENTLST
 
 N_TYPE : N_SIMPLE
 {
-    $$.type = $1.type; 
+    $$.type = $1.type;
     printRule("N_TYPE", "N_SIMPLE");
 }
 | N_ARRAY
@@ -672,6 +680,14 @@ void fillSymbolTable(TYPE_INFO info) {
         char* ident = *i;
         bool multiplyDeclared = programScope.symbolDeclared(ident);
 
+        if(vardec) {
+            info.offset = offset++;
+            info.level = level;
+        } else {
+            info.offset = -1;
+            info.level = -1;
+        }
+
         programScope.insertSymbol(ident, info);
         if(info.type != ARRAY) 
             if(logging) printf("___Adding %s to symbol table with type %s\n", ident, name.c_str());
@@ -686,6 +702,8 @@ void fillSymbolTable(TYPE_INFO info) {
             printf("Line %d: Multiply defined identifier\n", numLines);
             exit(0);
         }
+
+        if(vardec) cout << ident << " - la " << info.offset << ", " << info.level << endl;
     }
 
     ident_buffer = std::list<char*>();
