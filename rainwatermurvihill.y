@@ -145,7 +145,6 @@ int lab;
 %type <typeInfo> N_ARRAY N_IDENT N_TYPE N_IDX N_INTCONST N_IDXRANGE N_SIMPLE N_SIGN N_VARIDENT N_ENTIREVAR N_ARRAYVAR N_VARIABLE N_IDXVAR
 %nonassoc T_THEN
 %nonassoc T_ELSE
-
 %start N_START
 
 %%
@@ -440,16 +439,16 @@ N_OUTPUT : N_EXPR
     printRule("N_OUTPUT", "N_EXPR");
 }
 
-N_CONDITION : T_IF N_EXPR T_THEN N_STMT
+N_ELSE : T_ELSE N_STMT
+       | /* epsilon*/
+
+N_CONDITION : {$<lab>$ = label; label++;}T_IF {$<lab>$ = label; label++;} N_EXPR {printf("jf L.%d\n",$<lab>1);}T_THEN N_STMT{printf("jp L.%d\n",$<lab>3); printf("L.%d:\n", $<lab>1); } N_ELSE 
 {
-    verifyBoolExpr($2);
+    printf("L.%d:\n", $<lab>3);
+    verifyBoolExpr($4);
     printRule("N_CONDITION", "T_IF N_EXPR T_THEN N_STMT");
 }
-| T_IF N_EXPR T_THEN N_STMT T_ELSE N_STMT
-{
-    verifyBoolExpr($2);
-    printRule("N_CONDITION", "T_IF N_EXPR T_THEN N_STMT T_ELSE N_STMT");
-}
+
 
 N_WHILE : {printf("L.%d:\n",label); $<lab>$ = label; label++;} T_WHILE { $<lab>$ = label; label++;} N_EXPR {printf("jf L.%d\n",$<lab>3);verifyBoolExpr($4);} T_DO N_STMT 
 {
