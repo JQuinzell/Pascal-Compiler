@@ -24,6 +24,7 @@ bool validateIntConst(const char* intconst);
 void findIdentifier(const char* ident);
 int yyerror(const char *s);
 bool vardec;
+vector<string> procedureStack(0);
 
 bool logging = false;
 const char* maxint = "2147483647";
@@ -307,6 +308,7 @@ N_PROCDEC : N_PROCHDR  N_BLOCK
 {
     if(level == 0) globalSize++;
     printRule("N_PROCDEC", "N_PROCHDR N_BLOCK");
+    if(!procedureStack.empty()) procedureStack.pop_back();
 }
 
 N_PROCHDR : T_PROC T_IDENT T_SCOLON
@@ -317,6 +319,8 @@ N_PROCHDR : T_PROC T_IDENT T_SCOLON
     t.type = PROCEDURE;
     t.label = label;
     t.level = level;
+    procedureStack.push_back($2);
+    cout << "Proc: " << $2 << " - level=" << level+1 << endl;
     ident_buffer.push_back($2);
     fillSymbolTable(t);
     programScope.pushScope();
@@ -389,10 +393,23 @@ N_PROCSTMT : N_PROCIDENT
 N_PROCIDENT : T_IDENT
 {
     //generate jump to proc
-    TYPE_INFO proc = programScope.getSymbol($1);
-    if(!global) cout << "push " << proc.level + 1 << ", 0" << endl;
-    cout << "js L." << proc.label << endl;
-    if(!global) cout << "pop " << proc.level + 1 << ", 0" << endl;
+    if(!global) {
+    for (std::vector<string>::reverse_iterator p = procedureStack.rbegin(); p != procedureStack.rend(); ++p)
+    {
+        if(*p == string($1)) break;
+        TYPE_INFO proc = programScope.getSymbol(p->c_str());
+        cout << "push " << proc.level + 1 << ", 0" << endl;
+    }
+    }
+    cout << "js L." << programScope.getSymbol($1).label << endl;
+    if(!global) {
+    for (std::vector<string>::iterator p = procedureStack.begin(); p != procedureStack.end(); ++p)
+    {
+        if(*p == string($1)) break;
+        TYPE_INFO proc = programScope.getSymbol(p->c_str());
+        cout << "pop " << proc.level + 1 << ", 0" << endl;
+    }
+    }
     printRule("N_PROCIDENT", "T_IDENT");
 }
 
