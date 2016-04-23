@@ -452,6 +452,7 @@ N_SIMPLEEXPR : N_TERM N_ADDOPLST
 
 N_ADDOPLST : N_ADDOP N_TERM N_ADDOPLST
 {
+    cout << "add" << endl;
     printRule("N_ADDOPLST", "N_ADDOP N_TERM N_ADDOPLST");
 }
 | /* epsilon */
@@ -480,6 +481,8 @@ N_FACTOR : N_SIGN N_VARIABLE
 {
     $$ = $2.type;
     if($1.type == INTEGER) verifyIntExpr($$);
+    //variable is loaded, deref it for use
+    cout << "deref" << endl;
     printRule("N_FACTOR", "N_SIGN N_VARIABLE");
 }
 | N_CONST
