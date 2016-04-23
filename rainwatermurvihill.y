@@ -731,7 +731,7 @@ void fillSymbolTable(TYPE_INFO info) {
             exit(0);
         }
 
-        //if(vardec) cout << ident << " - la " << info.offset << ", " << info.level << endl;
+        // if(vardec) cout << ident << " - la " << info.offset << ", " << info.level << endl;
     }
 
     ident_buffer = std::list<char*>();
