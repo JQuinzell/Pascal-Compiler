@@ -393,21 +393,25 @@ N_PROCSTMT : N_PROCIDENT
 N_PROCIDENT : T_IDENT
 {
     //generate jump to proc
+    for (std::vector<string>::iterator i = procedureStack.begin(); i != procedureStack.end(); ++i)
+    {
+        cout << *i << endl;
+    }
     if(!global) {
     for (std::vector<string>::reverse_iterator p = procedureStack.rbegin(); p != procedureStack.rend(); ++p)
     {
-        if(*p == string($1)) break;
         TYPE_INFO proc = programScope.getSymbol(p->c_str());
         cout << "push " << proc.level + 1 << ", 0" << endl;
+        if(*p == string($1)) break;
     }
     }
     cout << "js L." << programScope.getSymbol($1).label << endl;
     if(!global) {
     for (std::vector<string>::iterator p = procedureStack.begin(); p != procedureStack.end(); ++p)
     {
-        if(*p == string($1)) break;
         TYPE_INFO proc = programScope.getSymbol(p->c_str());
         cout << "pop " << proc.level + 1 << ", 0" << endl;
+        if(*p == string($1)) break;
     }
     }
     printRule("N_PROCIDENT", "T_IDENT");
