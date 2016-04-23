@@ -452,7 +452,6 @@ N_SIMPLEEXPR : N_TERM N_ADDOPLST
 
 N_ADDOPLST : N_ADDOP N_TERM N_ADDOPLST
 {
-    cout << "add" << endl;
     printRule("N_ADDOPLST", "N_ADDOP N_TERM N_ADDOPLST");
 }
 | /* epsilon */
@@ -523,10 +522,12 @@ N_SIGN : T_PLUS
 
 N_ADDOP : T_PLUS
 {
+    cout << "add" << endl;
     printRule("N_ADDOP", "T_PLUS");
 }
 | T_MINUS
 {
+    cout << "sub" << endl;
     printRule("N_ADDOP", "T_MINUS");
 }
 | T_OR
@@ -536,11 +537,13 @@ N_ADDOP : T_PLUS
 
 N_MULTOP : T_MULT
 {
+    cout << "mult" << endl;
     $$ = INTEGER;
     printRule("N_MULTOP", "T_MULT");
 }
 | T_DIV
 {
+    cout << "div" << endl;
     $$ = INTEGER;
     printRule("N_MULTOP", "T_DIV");
 }
