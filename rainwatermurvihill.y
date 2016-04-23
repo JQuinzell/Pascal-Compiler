@@ -13,7 +13,8 @@ int globalSize = 0;
 int level = 0;
 int offset = 20;
 int label = 4;
-bool negatory = false;
+string relop = "";
+string arithop = "";
 void printToken(const char* tokenType, const char* lexeme);
 void printError(const char* error, const char* lexeme);
 void parseError(const char* error);
@@ -442,6 +443,7 @@ N_EXPR : N_SIMPLEEXPR
 {
     $$ = BOOLEAN;
     verifySameTypeRel($1, $3);
+    cout << relop << endl;
     printRule("N_EXPR", "N_SIMPLEEXPR N_RELOP N_SIMPLEEXPR");
 }
 
@@ -453,6 +455,7 @@ N_SIMPLEEXPR : N_TERM N_ADDOPLST
 
 N_ADDOPLST : N_ADDOP N_TERM N_ADDOPLST
 {
+    cout << arithop << endl;
     printRule("N_ADDOPLST", "N_ADDOP N_TERM N_ADDOPLST");
 }
 | /* epsilon */
@@ -470,6 +473,7 @@ N_MULTOPLST : N_MULTOP N_FACTOR N_MULTOPLST
 {
     $$ = $1; // will probably need to be based on a check
     verifySameType($1, $2);
+    cout << arithop << endl;
     printRule("N_MULTOPLST", "N_MULTOP N_FACTOR N_MULTOPLST");
 }
 | /* epsilon */
@@ -483,8 +487,7 @@ N_FACTOR : N_SIGN N_VARIABLE
     if($1.type == INTEGER) verifyIntExpr($$);
     //variable is loaded, deref it for use
     cout << "deref" << endl;
-    if(negatory) cout << "neg" << endl;
-    negatory = false;
+    if($1.startIndex == -1) cout << "neg" << endl;
     printRule("N_FACTOR", "N_SIGN N_VARIABLE");
 }
 | N_CONST
@@ -499,6 +502,7 @@ N_FACTOR : N_SIGN N_VARIABLE
 }
 | T_NOT N_FACTOR
 {
+    cout << "not" << endl;
     $$ = $2;
     verifyBoolExpr($2);
     printRule("N_FACTOR", "T_NOT N_FACTOR");
@@ -512,7 +516,6 @@ N_SIGN : T_PLUS
 }
 | T_MINUS
 {
-    negatory = true;
     $$.type = INTEGER;
     $$.startIndex = -1;
     printRule("N_SIGN", "T_MINUS");
@@ -526,59 +529,67 @@ N_SIGN : T_PLUS
 
 N_ADDOP : T_PLUS
 {
-    cout << "add" << endl;
+    arithop = "add";
     printRule("N_ADDOP", "T_PLUS");
 }
 | T_MINUS
 {
-    cout << "sub" << endl;
+    arithop = "sub";
     printRule("N_ADDOP", "T_MINUS");
 }
 | T_OR
 {
+    arithop = "or";
     printRule("N_ADDOP", "T_OR");
 }
 
 N_MULTOP : T_MULT
 {
-    cout << "mult" << endl;
+    arithop = "mult";
     $$ = INTEGER;
     printRule("N_MULTOP", "T_MULT");
 }
 | T_DIV
 {
-    cout << "div" << endl;
+    arithop = "div";
     $$ = INTEGER;
     printRule("N_MULTOP", "T_DIV");
 }
 | T_AND
 {
+    arithop = "and";
     $$ = BOOLEAN;
     printRule("N_MULTOP", "T_AND");
 }
 
 N_RELOP : T_LT
 {
+    relop = ".lt.";
     printRule("N_RELOP", "T_LT");
 }
 | T_LE
 {
+    relop = ".le.";
     printRule("N_RELOP", "T_LE");
 }
 | T_NE
 {
+    relop = ".ne.";
     printRule("N_RELOP", "T_NE");
 }
 | T_EQ
 {
+    relop = ".eq.";
     printRule("N_RELOP", "T_EQ");
 }
 | T_GT
 {
+    relop = ".gt.";
     printRule("N_RELOP", "T_GT");
 }
 | T_GE
 {
+    relop = ".ge.";
     printRule("N_RELOP", "T_GE");
 }
 
@@ -653,12 +664,12 @@ N_INTCONST : N_SIGN T_INTCONST //we Need a Conversion!!!!!
 
 N_BOOLCONST : T_TRUE
 {
-    //printf("1");
+    cout << "lc 1" << endl;
     printRule("N_BOOLCONST", "T_TRUE");
 }
 | T_FALSE
 {
-    //printf("0");
+    cout << "lc 0" << endl;
     printRule("N_BOOLCONST", "T_FALSE");
 }
 
