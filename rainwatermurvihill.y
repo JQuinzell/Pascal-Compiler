@@ -13,6 +13,7 @@ int globalSize = 0;
 int level = 0;
 int offset = 20;
 int label = 4;
+bool negatory = false;
 void printToken(const char* tokenType, const char* lexeme);
 void printError(const char* error, const char* lexeme);
 void parseError(const char* error);
@@ -482,6 +483,8 @@ N_FACTOR : N_SIGN N_VARIABLE
     if($1.type == INTEGER) verifyIntExpr($$);
     //variable is loaded, deref it for use
     cout << "deref" << endl;
+    if(negatory) cout << "neg" << endl;
+    negatory = false;
     printRule("N_FACTOR", "N_SIGN N_VARIABLE");
 }
 | N_CONST
@@ -509,6 +512,7 @@ N_SIGN : T_PLUS
 }
 | T_MINUS
 {
+    negatory = true;
     $$.type = INTEGER;
     $$.startIndex = -1;
     printRule("N_SIGN", "T_MINUS");
