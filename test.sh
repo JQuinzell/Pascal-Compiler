@@ -6,7 +6,7 @@ for f in input/*; do
 	file=${f%.txt}
 	echo Testing ${file##*/}
 	# diff -w oalOutput.oal oalExamples/${file##*/}.oal
-	oal oalOutput.oal > output.txt
+	./oal oalOutput.oal > output.txt
 	diff -w output.txt output/${file##*/}.txt.out
 done
 
@@ -15,7 +15,7 @@ else
 echo Testing $1
 ./a.out input/$1.txt > oalOutput.oal
 diff -yw oalOutput.oal oalExamples/$1.oal
-# oal oalOutput.oal > output.txt
+# ./oal oalOutput.oal > output.txt
 # diff -w output.txt output/$1.txt.out
 
 fi
