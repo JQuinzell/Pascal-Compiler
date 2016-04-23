@@ -400,7 +400,7 @@ N_OUTPUTLST : T_COMMA N_OUTPUT N_OUTPUTLST
     printRule("N_OUTPUTLST", "epsilon");
 }
 
-N_OUTPUT : {printf("lc");} N_EXPR
+N_OUTPUT : {printf("lc\n");} N_EXPR
 {
     verifyOutputExpr($2);
     if ($2 == INTEGER) {printf("iwrite\n");} 
@@ -609,12 +609,12 @@ N_VARIDENT :  T_IDENT
 N_CONST : N_INTCONST
 {
     $$ = INTEGER;
-    printRule("N_CONST", "N_INTCONST");
-    printf(" %d\n",$1.startIndex);
+    //printRule("N_CONST", "N_INTCONST");
+    //printf(" %d\n",$1.startIndex);
 }
 | T_CHARCONST
 {
-    printf(" %d\n", static_cast<int>($1[1]));
+    //printf(" %d\n", static_cast<int>($1[1]));
     $$ = CHAR;
     printRule("N_CONST", "T_CHARCONST");
 }
@@ -632,12 +632,12 @@ N_INTCONST : N_SIGN T_INTCONST //we Need a Conversion!!!!!
 
 N_BOOLCONST : T_TRUE
 {
-    printf("1");
+    //printf("1");
     printRule("N_BOOLCONST", "T_TRUE");
 }
 | T_FALSE
 {
-    printf("0");
+    //printf("0");
     printRule("N_BOOLCONST", "T_FALSE");
 }
 
