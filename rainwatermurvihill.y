@@ -46,6 +46,10 @@ void loadVariable(TYPE_INFO info) {
  cout << "la " << info.offset << ", " << info.level << endl;
 }
 
+void asp(int num) {
+    if(num != 0) cout << "asp " << num << endl;
+}
+
 void verifyArrayType(TYPE_INFO);
 void verifyArrayIndexes(const int x, const int y);
 void verifyBoolExpr(TOKEN_TYPE);
@@ -177,12 +181,12 @@ N_BLOCK : {level++; offset=0;  $<lab>$ = label; label++;}  N_VARDECPART N_PROCDE
           {
             printf("L.%d:\n", $<lab>1); 
             printf("save %d, %d\n", level , 0); 
-            if(level > 0){printf("asp %d\n", $2);}
+            if(level > 0){asp($2);}
           }
           N_STMTPART
 
 {
-    if(level > 0){printf("asp %d\n", -1 * $2);}
+    if(level > 0){asp(-1 * $2);}
     printf("ji\n");
     level--;
     offset = 0;
