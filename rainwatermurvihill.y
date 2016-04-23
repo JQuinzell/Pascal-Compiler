@@ -604,11 +604,11 @@ N_CONST : N_INTCONST
 {
     $$ = INTEGER;
     printRule("N_CONST", "N_INTCONST");
-    printf(" %d\n",$1.startIndex);
+    // printf(" %d\n",$1.startIndex);
 }
 | T_CHARCONST
 {
-    printf(" %d\n", static_cast<int>($1[1]));
+    // printf(" %d\n", static_cast<int>($1[1]));
     $$ = CHAR;
     printRule("N_CONST", "T_CHARCONST");
 }
