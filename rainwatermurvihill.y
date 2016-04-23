@@ -173,9 +173,11 @@ N_PROG : N_PROGLBL { programScope.pushScope(); } T_IDENT T_SCOLON
 N_VARDECPART { cout << "L.0:\nbss " << 20 + globalSize << "\nL.2:" << endl; } N_PROCDECPART {cout << "L.3:\n";} N_STMTPART T_DOT
 
 N_BLOCK : {level++; offset=0;  $<lab>$ = label; 
-    label++;}  N_VARDECPART N_PROCDECPART {printf("L.%d:\n", $<lab>1);} N_STMTPART
+    label++;}  N_VARDECPART N_PROCDECPART {printf("L.%d:\n", $<lab>1); printf("save %d, %d\n", level , 0); if(level > 0){printf("asp %d\n", offset);}} N_STMTPART
 
 {
+    if(level > 0){printf("asp %d\n", -1 * offset);}
+    printf("ji\n");
     level--;
     offset = 0;
     printRule("N_BLOCK", " N_VARDECPART N_PROCDECPART N_STMTPART");
