@@ -176,7 +176,7 @@ N_PROG : N_PROGLBL { programScope.pushScope(); } T_IDENT T_SCOLON
     printRule("N_PROG", "N_PROGLBL T_IDENT T_SCOLON N_BLOCK T_DOT");
     fillSymbolTable(t);
 }
-N_VARDECPART { cout << "L.0:\nbss " << 20 + globalSize << "\nL.2:" << endl; } N_PROCDECPART {cout << "L.3:\n"; global = true; } N_STMTPART T_DOT
+N_VARDECPART { cout << "L.0:\nbss " << 20 + globalSize << "\nL.2:" << endl; } N_PROCDECPART {cout << "L.3:\n"; } N_STMTPART T_DOT
 
 N_BLOCK : {level++; offset=0;  $<lab>$ = label; label++;}  N_VARDECPART N_PROCDECPART
           {
@@ -320,7 +320,7 @@ N_PROCHDR : T_PROC T_IDENT T_SCOLON
     t.label = label;
     t.level = level;
     procedureStack.push_back($2);
-    cout << "Proc: " << $2 << " - level=" << level+1 << endl;
+    //cout << "Proc: " << $2 << " - level=" << level+1 << endl;
     ident_buffer.push_back($2);
     fillSymbolTable(t);
     programScope.pushScope();
@@ -393,15 +393,18 @@ N_PROCSTMT : N_PROCIDENT
 N_PROCIDENT : T_IDENT
 {
     //generate jump to proc
+    
     for (std::vector<string>::iterator i = procedureStack.begin(); i != procedureStack.end(); ++i)
     {
-        cout << *i << endl;
+        //cout << *i << endl;
     }
+    std::vector<int> lzystorage; 
     if(!global) {
     for (std::vector<string>::reverse_iterator p = procedureStack.rbegin(); p != procedureStack.rend(); ++p)
     {
         TYPE_INFO proc = programScope.getSymbol(p->c_str());
         cout << "push " << proc.level + 1 << ", 0" << endl;
+        lzystorage.push_back(proc.level +1);
         if(*p == string($1)) break;
     }
     }
@@ -410,10 +413,12 @@ N_PROCIDENT : T_IDENT
     for (std::vector<string>::iterator p = procedureStack.begin(); p != procedureStack.end(); ++p)
     {
         TYPE_INFO proc = programScope.getSymbol(p->c_str());
-        cout << "pop " << proc.level + 1 << ", 0" << endl;
+        cout << "pop " << lzystorage.back() << ", 0" << endl;
+        lzystorage.pop_back();
         if(*p == string($1)) break;
     }
     }
+    global = true;
     printRule("N_PROCIDENT", "T_IDENT");
 }
 
@@ -464,10 +469,10 @@ N_OUTPUT : N_EXPR
     printRule("N_OUTPUT", "N_EXPR");
 }
 
-N_ELSE : T_ELSE N_STMT
+N_ELSE : T_ELSE{global = false;} N_STMT  
        | /* epsilon*/
 
-N_CONDITION : {$<lab>$ = label; label++;}T_IF {$<lab>$ = label; label++;} N_EXPR {printf("jf L.%d\n",$<lab>1);}T_THEN N_STMT{printf("jp L.%d\n",$<lab>3); printf("L.%d:\n", $<lab>1); } N_ELSE 
+N_CONDITION : {$<lab>$ = label; label++;}T_IF {$<lab>$ = label; label++;} N_EXPR {printf("jf L.%d\n",$<lab>1);}T_THEN {global = false;} N_STMT{printf("jp L.%d\n",$<lab>3); printf("L.%d:\n", $<lab>1);} N_ELSE 
 {
     printf("L.%d:\n", $<lab>3);
     verifyBoolExpr($4);
