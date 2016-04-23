@@ -382,6 +382,7 @@ N_READ : T_READ T_LPAREN N_INPUTVAR N_INPUTLST T_RPAREN
 
 N_INPUTLST : T_COMMA N_INPUTVAR N_INPUTLST
 {
+
     printRule("N_INPUTLST", "T_COMMA N_INPUTVAR N_INPUTLST");
 }
 | /* epsilon */
@@ -392,6 +393,9 @@ N_INPUTLST : T_COMMA N_INPUTVAR N_INPUTLST
 N_INPUTVAR : N_VARIABLE
 {
     $$ = $1.type;
+    if ($1.type == INTEGER) {printf("iread\n");} 
+    if ($1.type == CHAR) {printf("cread\n");}
+   printf("st\n"); 
     printRule("N_INPUTVAR", "N_VARIABLE");
 }
 
