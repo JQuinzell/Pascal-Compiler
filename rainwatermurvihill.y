@@ -13,7 +13,7 @@ int globalSize = 0;
 int level = 0;
 int offset = 20;
 int label = 4;
-bool global = false;
+bool global = true;
 string relop = "";
 string arithop = "";
 void printToken(const char* tokenType, const char* lexeme);
@@ -104,7 +104,7 @@ public:
 
     TYPE_INFO getSymbol(const char* ident) {
         std::map<std::string, TYPE_INFO>::iterator it;
-        for (std::vector<SymbolTable>::iterator scope = table.begin(); scope != table.end(); ++scope)
+        for (std::vector<SymbolTable>::reverse_iterator scope = table.rbegin(); scope != table.rend(); ++scope)
         {
             it = scope->find(ident);
             if (it != scope->end())
@@ -176,7 +176,7 @@ N_PROG : N_PROGLBL { programScope.pushScope(); } T_IDENT T_SCOLON
     printRule("N_PROG", "N_PROGLBL T_IDENT T_SCOLON N_BLOCK T_DOT");
     fillSymbolTable(t);
 }
-N_VARDECPART { cout << "L.0:\nbss " << 20 + globalSize << "\nL.2:" << endl; } N_PROCDECPART {cout << "L.3:\n"; } N_STMTPART T_DOT
+N_VARDECPART { cout << "L.0:\nbss " << 20 + globalSize << "\nL.2:" << endl; } N_PROCDECPART {cout << "L.3:\n"; global = true;} N_STMTPART T_DOT
 
 N_BLOCK : {level++; offset=0;  $<lab>$ = label; label++;}  N_VARDECPART N_PROCDECPART
           {
@@ -220,8 +220,14 @@ N_VARDEC : N_IDENT N_IDENTLST T_COLON N_TYPE
     // insertSymbol($1, $4);// assuming N_IDENTLST -> Epsilon 
     if(level == 0) globalSize += ident_buffer.size() * $4.size;
     printRule("N_VARDEC", "N_IDENT N_IDENTLST T_COLON N_TYPE");
-    vardec = true;
+    vardec = true; /*
+    cout << boolalpha << ($4.type == ARRAY) << endl; 
+for (std::list<char*>::iterator i = ident_buffer.begin(); i != ident_buffer.end(); ++i)
+    {
+        cout << *i << endl;  ////////////////////////////////////////////////
+         }*/
     fillSymbolTable($4);
+    //cout << "done" << endl;
     vardec = false;
 }
 
@@ -410,6 +416,7 @@ N_PROCIDENT : T_IDENT
     }
     cout << "js L." << programScope.getSymbol($1).label << endl;
     if(!global) {
+      //cout << $1 << endl;
     for (std::vector<string>::iterator p = procedureStack.begin(); p != procedureStack.end(); ++p)
     {
         TYPE_INFO proc = programScope.getSymbol(p->c_str());
@@ -418,7 +425,8 @@ N_PROCIDENT : T_IDENT
         if(*p == string($1)) break;
     }
     }
-    global = true;
+    global = false;
+    if (level == 0)
     printRule("N_PROCIDENT", "T_IDENT");
 }
 
@@ -772,6 +780,7 @@ void findIdentifier(const char* ident) {
 
 void fillSymbolTable(TYPE_INFO info) {
     std::string name = getTypeName(info.type);
+
     for (std::list<char*>::iterator i = ident_buffer.begin(); i != ident_buffer.end(); ++i)
     {
         char* ident = *i;
@@ -783,7 +792,6 @@ void fillSymbolTable(TYPE_INFO info) {
             info.level = level;
             offset += info.size;
         }
-
         programScope.insertSymbol(ident, info);
         if(info.type != ARRAY) 
             if(logging) printf("___Adding %s to symbol table with type %s\n", ident, name.c_str());
