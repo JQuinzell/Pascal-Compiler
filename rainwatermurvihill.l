@@ -59,6 +59,7 @@ UNKNOWN     .
                 }
 
 {NEWLINE}       {
+                   pause(numLines);
                     numLines++;
                 }
 

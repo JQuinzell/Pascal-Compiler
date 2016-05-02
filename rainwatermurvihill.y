@@ -2,6 +2,11 @@
 Jared Rainwater
 Adam Murvihill
 HW7*/
+
+
+
+
+//HOW TO BREAK: add arugument after file EX: BREAK1,4$ 
 %{
 #include <string.h>
 #include <string>
@@ -11,7 +16,7 @@ HW7*/
 #include <list>
 #include <iostream>
 using namespace std;
-
+int breakptsint = 0;
 int numLines = 1;
 int globalSize = 0;
 int level = 0;
@@ -20,6 +25,7 @@ int label = 4;
 bool global = true;
 string relop = "";
 string arithop = "";
+void pause(int x);
 void printToken(const char* tokenType, const char* lexeme);
 void printError(const char* error, const char* lexeme);
 void parseError(const char* error);
@@ -33,7 +39,7 @@ vector<string> procedureStack(0);
 bool logging = false;
 const char* maxint = "2147483647";
 vector<string> oalCode(0);
-
+vector<int> breakpts;
 enum TOKEN_TYPE { PROGRAM, ARRAY, INTEGER, CHAR, BOOLEAN, PROCEDURE, UNDECLARED };
 
 struct TYPE_INFO {
@@ -746,6 +752,16 @@ N_BOOLCONST : T_TRUE
 #include "lex.yy.c"
 extern FILE *yyin;
 
+void pause(int x)
+{ 
+ 
+  if (breakpts[breakptsint] == x)
+   {
+     printf("PAUSE\n");
+     breakptsint++;
+   }
+ }
+
 void printToken(const char* tokenType, const char* lexeme) {
     if(logging) printf("TOKEN: %s LEXEME:\t%s\n", tokenType, lexeme);
 }
@@ -849,6 +865,38 @@ int main(int argc, char** argv) {
       printf("You must specify a file in the command line!\n");
       exit(1);
     }
+   if(argc == 3) {
+   if (argv[2][0] == 'B' && argv[2][1] == 'R' && argv[2][2] == 'E' && argv[2][3] == 'A' && argv[2][4] == 'K') 
+   {
+   //cout << argv[2] << endl;
+   int i = 5;
+   while (argv[2][i] != '$')
+   {
+   if ( argv[2][i] == ',')
+    {
+   i++;
+    }
+    else
+      {
+      char* a = new char[10];
+      int x = 0;
+      a[0] = argv[2][i];
+      i++;
+          while(argv[2][i]  != ',' && argv[2][i]  != '$' && x < 8)
+          {
+           a[x+1] = argv[2][i];
+           x++;
+           i++;
+           }
+         a[x+1] = '\0';
+         int q = atoi(a);
+         breakpts.push_back(q);
+       delete[] a;
+       }
+   }
+   }
+    }
+   
     yyin = fopen(argv[1], "r");
 
   do {

@@ -197,7 +197,7 @@ LABEL			"L."[0-9]+
 				return T_END;
 			}
 {IDENT}         {
-		    //yylval.text = strdup(yytext);
+		    yylval.text = strdup(yytext);
                     printTokenInfo("T_IDENT", yytext);
                     return T_IDENT;                    
                 }

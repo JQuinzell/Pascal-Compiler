@@ -40,6 +40,15 @@ int instrxCount = 0;
 int entryPointInstrxNum = -1, haltPointInstrxNum = -1;
 int displaySize = 0;
 
+
+typedef struct 
+{
+char* name;
+int offset;
+int level;
+} saved_var;
+
+vector<saved_var> saved_varlist; 
 // Arithmetic stack holds integers and memory locations 
 // (offset & level)
 typedef struct { int val1, val2; } arithmeticStackElt;
@@ -148,6 +157,7 @@ extern "C" {
 
 %union {
   int	num;
+  char* text;
   Cstring cstring;
   struct { int offset, level; } memLoc;
 };
@@ -158,11 +168,11 @@ extern "C" {
 %token  T_JP  T_JF  T_JT  T_JS  T_JI  T_BSS  T_ASP T_ST
 %token  T_PUSH  T_POP  T_SAVE  T_LC  T_LV  T_LA  T_DEREF  
 %token  T_ADD  T_SUB  T_MULT  T_DIV T_MOD  T_AND  T_OR 
-%token  T_COMMA T_COLON  T_PAUSE T_IDENT T_VAR
+%token  T_COMMA T_COLON  T_PAUSE T_VAR
 %token  T_EQ  T_NE  T_LT  T_LE  T_GT  T_GE  T_NEG  T_NOT 
 %token  T_CREAD  T_IREAD  T_CWRITE  T_IWRITE  T_INIT  T_HALT  
 %token  T_NCONST  T_PCONST  T_UNKNOWN T_LABEL  T_ENTRY T_END
-
+%token <text> T_IDENT
 %type	<cstring> T_LABEL T_ENTRY N_ENTRYPOINT_LABEL
 %type <num> N_INTCONST T_NCONST T_PCONST N_JUMP_OP
 %type <memLoc> N_MEMORY_LOC
@@ -179,11 +189,20 @@ extern "C" {
 
 N_VAR  : T_VAR T_IDENT N_INTCONST N_INTCONST
               {
+              saved_var x;
+              x.name = $2;
+              x.offset = $3;
+              x.level = $4;
+              saved_varlist.push_back(x);
               }
               ;
 
 N_PAUSE                 : T_PAUSE
                               {
+                              for (int x =0; x <saved_varlist.size(); x++)
+                                {
+                                  printf("Variable Name: %s Offset: %d Level: %d\n", saved_varlist[x].name,saved_varlist[x].offset,saved_varlist[x].level);
+                                }
                               int pause_var = 0;
                               initDisplay();
                               dumpExecutionStack();
