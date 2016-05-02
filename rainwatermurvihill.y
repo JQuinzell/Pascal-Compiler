@@ -1,3 +1,7 @@
+/*
+Jared Rainwater
+Adam Murvihill
+HW7*/
 %{
 #include <string.h>
 #include <string>
@@ -224,9 +228,12 @@ N_VARDEC : N_IDENT N_IDENTLST T_COLON N_TYPE
     cout << boolalpha << ($4.type == ARRAY) << endl; 
 for (std::list<char*>::iterator i = ident_buffer.begin(); i != ident_buffer.end(); ++i)
     {
-        cout << *i << endl;  ////////////////////////////////////////////////
+        cout << *i << endl;  ////////////////////////////////////////////////?????????????????????????????????????????
          }*/
     fillSymbolTable($4);
+    TYPE_INFO t;
+   t = programScope.getSymbol($1.name); 
+    printf("VAR %s %d %d\n",$1.name,t.offset, t.level);
     //cout << "done" << endl;
     vardec = false;
 }

@@ -18,7 +18,7 @@
 
 NEWLINE         \n
 WSPACE		[ \t\v\r]+
-
+IDENT       [_a-zA-Z][_a-zA-Z0-9]*
 NEG_INTCONST	"-"[0-9]+
 POS_INTCONST	[0-9]+
 
@@ -29,6 +29,13 @@ LABEL			"L."[0-9]+
 */
 %%
 
+"VAR"        {return T_VAR;}
+
+"PAUSE"                 { 
+                        return T_PAUSE; 
+                        }
+
+                       
 "#"			{
 				/* if comment, skip until eoln. */
 				ignoreComment();
@@ -189,6 +196,12 @@ LABEL			"L."[0-9]+
 				printTokenInfo("T_END", yytext);
 				return T_END;
 			}
+{IDENT}         {
+		    //yylval.text = strdup(yytext);
+                    printTokenInfo("T_IDENT", yytext);
+                    return T_IDENT;                    
+                }
+
 {NEG_INTCONST}	{
 				printTokenInfo("T_NCONST", yytext);
                       yylval.num = atoi(yytext);

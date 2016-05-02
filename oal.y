@@ -15,6 +15,8 @@
 /*
  *	Declaration section.
  */
+//Figure how to map execution stack to name of variable in code
+
 %{
 #include <stdio.h>
 #include <string.h>
@@ -120,6 +122,7 @@ bool checkLabels();
 
 // Debugging, initialization, etc. functions
 void dumpExecutionStack();
+//void dumparithmeticStack(); 
 void bail(const char *s);
 void initDisplay();
 void performEvaluation();
@@ -155,7 +158,7 @@ extern "C" {
 %token  T_JP  T_JF  T_JT  T_JS  T_JI  T_BSS  T_ASP T_ST
 %token  T_PUSH  T_POP  T_SAVE  T_LC  T_LV  T_LA  T_DEREF  
 %token  T_ADD  T_SUB  T_MULT  T_DIV T_MOD  T_AND  T_OR 
-%token  T_COMMA T_COLON  
+%token  T_COMMA T_COLON  T_PAUSE T_IDENT T_VAR
 %token  T_EQ  T_NE  T_LT  T_LE  T_GT  T_GE  T_NEG  T_NOT 
 %token  T_CREAD  T_IREAD  T_CWRITE  T_IWRITE  T_INIT  T_HALT  
 %token  T_NCONST  T_PCONST  T_UNKNOWN T_LABEL  T_ENTRY T_END
@@ -173,6 +176,25 @@ extern "C" {
  *	Translation rules.
  */
 %%
+
+N_VAR  : T_VAR T_IDENT N_INTCONST N_INTCONST
+              {
+              }
+              ;
+
+N_PAUSE                 : T_PAUSE
+                              {
+                              int pause_var = 0;
+                              initDisplay();
+                              dumpExecutionStack();
+                              while (pause_var == 0)
+                                 {
+                                  printf("Type any non zero number to Continue\n");
+                                  pause_var = getchar();
+                                 }
+                              };
+                              
+			      ;	
 N_START			: N_PROG
 				{
 				prRule("N_START", "N_PROG");
@@ -184,7 +206,10 @@ N_START			: N_PROG
 				return 0;
 				}
 				;
-N_PROG			: N_INIT N_GLOBAL N_DISPLAY_BSS 
+N_GLOBVAR               :N_VAR 
+                        |
+                        ;
+N_PROG			: N_INIT N_GLOBVAR N_GLOBAL N_GLOBVAR N_DISPLAY_BSS N_GLOBVAR
 				  N_EXEC_CODE_LABEL N_EXEC_CODE
                      	  N_ENTRYPOINT_LABEL N_MAIN_CODE N_HALT 					  N_STACK_LABEL N_STACK_BSS T_END
 				{
@@ -278,6 +303,7 @@ N_HALT  		      : T_HALT
                     	addInstruction(labelInstrx);  
 				}
 				;
+
 N_EXEC_CODE  		: N_INSTRX_LIST
 				{
 				prRule("N_EXEC_CODE",
@@ -327,6 +353,8 @@ N_INSTRX			: N_JUMP_INSTRX
 				{
 				prRule("N_INSTRX", "N_OUTPUT_INSTRX");
 				}
+				| N_PAUSE
+                                | N_VAR
 				;
 N_INTCONST  		: T_NCONST
 				{
@@ -1165,6 +1193,17 @@ void dumpExecutionStack()
            i, executionStack[i]);
   return;
 }
+/*
+//////////////////////////////////////////////////////////////////////////////////////////
+void dumparithmeticStack() 
+{  
+  printf("\nArithmetic stack contents:\n");
+  for (int i = 0; i < arithmeticStack.size(); i++)
+    printf("  value1 %d, value2 %d\n", 
+           arithmeticStack[i].val1, arithmeticStack[i].val2);
+  return;
+}
+*/
 
 // Output the specified message and terminate program execution
 void bail(const char* s) 
