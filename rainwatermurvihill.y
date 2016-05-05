@@ -366,22 +366,27 @@ N_STMTLST : T_SCOLON N_STMT N_STMTLST
 
 N_STMT : N_ASSIGN
 {
+    printf("ASSIGN\n");
     printRule("N_STMT", "N_ASSIGN");
 }
 | N_PROCSTMT
 {
+    printf("PROCEDURE\n");
     printRule("N_STMT", "N_PROCSTMT");
 }
 | N_WRITE
 {
+    printf("WRITE\n");
     printRule("N_STMT", "N_WRITE");
 }
 | N_READ
 {
+    printf("READ\n");
     printRule("N_STMT", "N_READ");
 }
 | N_WHILE
 {
+    printf("WHILE\n");
     printRule("N_STMT", "N_WHILE");
 }
 | N_COMPOUND
@@ -390,6 +395,7 @@ N_STMT : N_ASSIGN
 }
 | N_CONDITION
 {
+    printf("CONDITION\n");
     printRule("N_STMT", "N_CONDITION");
 }
 

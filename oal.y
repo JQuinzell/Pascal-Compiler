@@ -77,7 +77,7 @@ std::list<string> definedLabels;
 // Maintain index into instructions vector for each label
 typedef struct { string labelName; int instrxNum; } labelInfo;
 std::list<labelInfo> labelInstrxNums;
-
+vector<string> reflist;
 // Function prototypes
 void addInstruction(ptrToFunction f, 
                     const int op1 = -1, const int op2 = -1);
@@ -168,7 +168,7 @@ extern "C" {
 %token  T_JP  T_JF  T_JT  T_JS  T_JI  T_BSS  T_ASP T_ST
 %token  T_PUSH  T_POP  T_SAVE  T_LC  T_LV  T_LA  T_DEREF  
 %token  T_ADD  T_SUB  T_MULT  T_DIV T_MOD  T_AND  T_OR 
-%token  T_COMMA T_COLON  T_PAUSE T_VAR
+%token  T_COMMA T_COLON  T_PAUSE T_VAR T_ASSIGN T_PROCEDURE T_WRITE T_READ T_WHILE T_CONDITION 
 %token  T_EQ  T_NE  T_LT  T_LE  T_GT  T_GE  T_NEG  T_NOT 
 %token  T_CREAD  T_IREAD  T_CWRITE  T_IWRITE  T_INIT  T_HALT  
 %token  T_NCONST  T_PCONST  T_UNKNOWN T_LABEL  T_ENTRY T_END
@@ -197,8 +197,52 @@ N_VAR  : T_VAR T_IDENT N_INTCONST N_INTCONST
               }
               ;
 
+N_REFPRINT : T_ASSIGN
+             {
+             string x;
+             x = "Assignment_statement";
+             reflist.push_back(x);
+             }
+             |
+             T_PROCEDURE
+             {
+             string x;
+             x = "Procedure_statement";
+             reflist.push_back(x);
+             }
+             |
+             T_WRITE
+             {
+             string x;
+             x = "Write_statement";
+             reflist.push_back(x);
+             }
+             |
+             T_READ
+             {
+             string x;
+             x = "Read_statement";
+             reflist.push_back(x);
+             }
+             |
+             T_WHILE
+             {
+             string x;
+             x = "while_statement";
+             reflist.push_back(x);
+             }
+             |
+             T_CONDITION
+             {
+             string x;
+             x = "Conditional_statement";
+             reflist.push_back(x);
+             }
+             ; 
+
 N_PAUSE                 : T_PAUSE
                               {
+                               printf("Last major statement type: %s\n", reflist[reflist.size()-1].c_str()); 
                               for (int x =0; x <saved_varlist.size(); x++)
                                 {
                                   printf("Variable Name: %s Offset: %d Level: %d\n", saved_varlist[x].name,saved_varlist[x].offset,saved_varlist[x].level);
@@ -374,6 +418,7 @@ N_INSTRX			: N_JUMP_INSTRX
 				}
 				| N_PAUSE
                                 | N_VAR
+                                | N_REFPRINT
 				;
 N_INTCONST  		: T_NCONST
 				{

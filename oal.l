@@ -35,6 +35,30 @@ LABEL			"L."[0-9]+
                         return T_PAUSE; 
                         }
 
+
+"ASSIGN"                {
+                          return T_ASSIGN;
+                        }
+
+"PROCEDURE"             {
+                          return T_PROCEDURE;
+                        }
+
+"WRITE"                 {
+                          return T_WRITE;
+                        }
+
+"READ"                  {
+                          return T_READ;
+                        }
+
+"WHILE"                 {
+                          return T_WHILE;
+                        }
+
+"CONDITION"             {
+                          return T_CONDITION;
+                        }
                        
 "#"			{
 				/* if comment, skip until eoln. */
