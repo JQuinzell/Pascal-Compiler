@@ -899,7 +899,7 @@ int main(int argc, char** argv) {
                    }
                  a[x+1] = '\0';
                  int q = atoi(a);
-                 breakpts.push_back(q);
+                 breakpts.push_back(q+1);
                delete[] a;
                }
            }
