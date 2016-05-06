@@ -52,6 +52,7 @@ int value;
 
 vector<saved_var> saved_varlist;
 vector<int> loaded_vars;
+int derefCount = 0;
 
 // Arithmetic stack holds integers and memory locations 
 // (offset & level)
@@ -841,7 +842,7 @@ void deref(const int op1, const int op2, int& instrxNum)
   }
   newStackElt.val2 = -1;
 
-  loaded_vars.pop_back();
+  derefCount++;
   arithmeticStack.push(newStackElt);
   instrxNum++;
   return;
@@ -869,6 +870,10 @@ void st(const int op1, const int op2, int& instrxNum)
   if (stackElt2.val2 == -1)
     bail("Invalid address in st!");
   
+  while(derefCount > 0) {
+  	loaded_vars.pop_back();
+  	derefCount--;
+  }
   int i = loaded_vars.back();
   saved_varlist[i].value = stackElt1.val1;
   loaded_vars.pop_back();
