@@ -2,3 +2,6 @@ rm rainwatermurvihill.tab.c
 flex rainwatermurvihill.l
 bison rainwatermurvihill.y
 g++ rainwatermurvihill.tab.c
+flex oal.l
+bison oal.y
+g++ oal.tab.c -o oal
