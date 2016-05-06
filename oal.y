@@ -841,6 +841,7 @@ void deref(const int op1, const int op2, int& instrxNum)
   }
   newStackElt.val2 = -1;
 
+  loaded_vars.pop_back();
   arithmeticStack.push(newStackElt);
   instrxNum++;
   return;
@@ -867,7 +868,7 @@ void st(const int op1, const int op2, int& instrxNum)
   arithmeticStack.pop();
   if (stackElt2.val2 == -1)
     bail("Invalid address in st!");
-
+  
   int i = loaded_vars.back();
   saved_varlist[i].value = stackElt1.val1;
   loaded_vars.pop_back();
