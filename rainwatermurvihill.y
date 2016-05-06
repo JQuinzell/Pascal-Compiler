@@ -240,7 +240,6 @@ for (std::list<char*>::iterator i = ident_buffer.begin(); i != ident_buffer.end(
     fillSymbolTable($4);
     TYPE_INFO t;
    t = programScope.getSymbol($1.name); 
-    printf("VAR %s %d %d\n",$1.name,t.offset, t.level);
     //cout << "done" << endl;
     vardec = false;
 }
@@ -821,6 +820,7 @@ void fillSymbolTable(TYPE_INFO info) {
             if(info.type == ARRAY) info.offset -= info.startIndex;
             info.level = level;
             offset += info.size;
+            printf("VAR %s %d %d\n", ident, info.offset, info.level);
         }
         programScope.insertSymbol(ident, info);
         if(info.type != ARRAY) 
