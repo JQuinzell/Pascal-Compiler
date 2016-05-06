@@ -713,7 +713,7 @@ void pause(const int op1, const int op2, int& instrxNum)
   while (pause_var == 0)
      {
       printf("Type any non zero number to Continue\n");
-      pause_var = getchar();
+      cin >> pause_var;
      }
   instrxNum++;
   return;
@@ -757,6 +757,7 @@ void lv(const int op1, const int op2, int& instrxnum)
   la(op1, op2, instrxnum);
   instrxnum--;          // because la will increment instrxNum
   deref(-1, -1, instrxnum); // deref also increments instrxNum
+  loaded_vars.pop_back();
   return;
 }
 
