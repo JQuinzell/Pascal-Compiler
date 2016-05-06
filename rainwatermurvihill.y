@@ -763,7 +763,7 @@ void pause(int x)
   if(!debug) return;
   if (breakpts[breakptsint] == x)
    {
-     printf("PAUSE\n");
+     printf("PAUSE %d\n", x);
      breakptsint++;
    }
  }
@@ -798,7 +798,6 @@ bool validateIntConst(const char* intconst) {
 
     return true;
 }
-
 
 void findIdentifier(const char* ident) {
     if(!programScope.findSymbol(ident)) {

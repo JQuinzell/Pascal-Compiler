@@ -245,9 +245,9 @@ N_REFPRINT : T_ASSIGN
              }
              ; 
 
-N_PAUSE                 : T_PAUSE
+N_PAUSE                 : T_PAUSE N_INTCONST
                               {
-                                addInstruction(pause);
+                                addInstruction(pause, $2);
                               };
                               
 			      ;	
@@ -702,7 +702,7 @@ void addInstruction(ptrToFunction f,
 
 void pause(const int op1, const int op2, int& instrxNum)
 {
-  printf("Last major statement type: %s\n", reflist[reflist.size()-1].c_str()); 
+  printf("MIPL Line#: %d\n", op1);
   for (int x =0; x <saved_varlist.size(); x++)
     {
       printf("Variable Name: %s Value: %d\n", saved_varlist[x].name,saved_varlist[x].value);
