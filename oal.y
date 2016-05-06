@@ -25,6 +25,7 @@
 #include <list>
 #include <stack>
 #include <vector>
+#include <iostream>
 using namespace std;
 
 #define DEBUG 0   // set to non-zero to see debugging output
@@ -46,9 +47,12 @@ typedef struct
 char* name;
 int offset;
 int level;
+int value;
 } saved_var;
 
-vector<saved_var> saved_varlist; 
+vector<saved_var> saved_varlist;
+vector<int> loaded_vars;
+
 // Arithmetic stack holds integers and memory locations 
 // (offset & level)
 typedef struct { int val1, val2; } arithmeticStackElt;
@@ -81,6 +85,7 @@ vector<string> reflist;
 // Function prototypes
 void addInstruction(ptrToFunction f, 
                     const int op1 = -1, const int op2 = -1);
+void pause(const int op1, const int op2, int& instrxNum);
 void lc(const int op1, const int op2, int& instrxNum);
 void la(const int op1, const int op2, int& instrxNum);
 void lv(const int op1, const int op2, int& instrxNum);
@@ -242,19 +247,7 @@ N_REFPRINT : T_ASSIGN
 
 N_PAUSE                 : T_PAUSE
                               {
-                               printf("Last major statement type: %s\n", reflist[reflist.size()-1].c_str()); 
-                              for (int x =0; x <saved_varlist.size(); x++)
-                                {
-                                  printf("Variable Name: %s Offset: %d Level: %d\n", saved_varlist[x].name,saved_varlist[x].offset,saved_varlist[x].level);
-                                }
-                              int pause_var = 0;
-                              initDisplay();
-                              dumpExecutionStack();
-                              while (pause_var == 0)
-                                 {
-                                  printf("Type any non zero number to Continue\n");
-                                  pause_var = getchar();
-                                 }
+                                addInstruction(pause);
                               };
                               
 			      ;	
@@ -707,6 +700,25 @@ void addInstruction(ptrToFunction f,
   return;
 }
 
+void pause(const int op1, const int op2, int& instrxNum)
+{
+  printf("Last major statement type: %s\n", reflist[reflist.size()-1].c_str()); 
+  for (int x =0; x <saved_varlist.size(); x++)
+    {
+      printf("Variable Name: %s Value: %d\n", saved_varlist[x].name,saved_varlist[x].value);
+    }
+  int pause_var = 0;
+  initDisplay();
+  dumpExecutionStack();
+  while (pause_var == 0)
+     {
+      printf("Type any non zero number to Continue\n");
+      pause_var = getchar();
+     }
+  instrxNum++;
+  return;
+}
+
 // Push value op1 onto arithmetic stack
 void lc(const int op1, const int op2, int& instrxNum) 
 {
@@ -727,6 +739,14 @@ void la(const int op1, const int op2, int& instrxNum)
   stackElt.val2 = op2; 
   arithmeticStack.push(stackElt);
   instrxNum++;
+  for (int i = 0; i < saved_varlist.size(); ++i)
+  {
+    saved_var v = saved_varlist[i];
+    if(v.offset == op1 && v.level == op2) {
+      loaded_vars.push_back(i);
+      break;
+    }
+  }
   return;
 }
 
@@ -846,6 +866,10 @@ void st(const int op1, const int op2, int& instrxNum)
   arithmeticStack.pop();
   if (stackElt2.val2 == -1)
     bail("Invalid address in st!");
+
+  int i = loaded_vars.back();
+  saved_varlist[i].value = stackElt1.val1;
+  loaded_vars.pop_back();
 
   if (stackElt2.val2 == 0)
      display[stackElt2.val1] = stackElt1.val1;
