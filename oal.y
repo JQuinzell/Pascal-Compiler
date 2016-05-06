@@ -268,11 +268,16 @@ N_START			: N_PROG
 				  }
 				return 0;
 				}
-				;
+/*				;
 N_GLOBVAR               :N_VAR 
                         |
+                      ; */ 
+
+N_GLOBVAR_LST:          N_VAR N_GLOBVAR_LST 
+                        |
                         ;
-N_PROG			: N_INIT N_GLOBVAR N_GLOBAL N_GLOBVAR N_DISPLAY_BSS N_GLOBVAR
+
+N_PROG			: N_INIT N_GLOBVAR_LST N_GLOBAL N_GLOBVAR_LST N_DISPLAY_BSS N_GLOBVAR_LST
 				  N_EXEC_CODE_LABEL N_EXEC_CODE
                      	  N_ENTRYPOINT_LABEL N_MAIN_CODE N_HALT 					  N_STACK_LABEL N_STACK_BSS T_END
 				{
